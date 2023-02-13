@@ -28,14 +28,15 @@ public class ApproveRequestDao {
 
             String sqlRequest="SELECT NR.ID,NR.CONTRACTID ,NR2.SEQUENCENO,NR2.GROUPNO,NR2.ID AS REQID,NR2.RULEVALUE,NR.ISSEQUENTIAL,NR.STATUS ,NR2.SEQSTATUS,NR2.STATUS as APPROVERSTATUS ,NR2.GROUPSTATUS FROM ndc_request NR  " +
                     "INNER JOIN ndc_requestworkflow NR2 ON NR.ID =NR2.REQUESTID " +
-                    "WHERE NR.CONTRACTID =? AND NR2.APPROVERID =? AND NR.REFERENCENO =? " ;
+                    "WHERE NR.CONTRACTID =? AND  NR.ACCOUNTNO=? AND NR2.APPROVERID =? AND NR.REFERENCENO =? " ;
                    // "AND NR.STATUS =? AND NR2.SEQSTATUS =? AND NR2.STATUS=? ";
 
             PreparedStatement statementS = connection.prepareStatement(sqlRequest);
 
             statementS.setString(1,requestDto.getContractId());
-            statementS.setString(2,requestDto.getApproverId());
-            statementS.setString(3,requestDto.getReferenceNo());
+            statementS.setString(2,requestDto.getAccountNo());
+            statementS.setString(3,requestDto.getApproverId());
+            statementS.setString(4,requestDto.getReferenceNo());
 
 
             ResultSet resultSet = statementS.executeQuery();

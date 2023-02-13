@@ -25,4 +25,5 @@ public class RequestDto {
 	private Integer groupNo;
     private String response;
 	private String assignDate;
+	private String accountNo;
 }

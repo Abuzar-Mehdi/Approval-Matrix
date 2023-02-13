@@ -63,6 +63,7 @@ public class CreateNewRequest  implements JavaService2 {
 		RequestDto requestDto = RequestDto.builder()
 				.requesterId("6284824056")
 				.contractId("8436131351")
+				.accountNo("1234545667")
 				.referenceNo("e8e2c8d6-97ea-11ed-a8fc-0242ac120003")
 				.remarks("request created by 6284824056")
 				.featureActionId("BILL_PAY")

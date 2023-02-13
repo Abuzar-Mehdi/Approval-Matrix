@@ -67,11 +67,10 @@ public class ApproveRequest  implements JavaService2{
 				 "  \"remarks\": \"Transaction Approved\"\n" +
 				 "}";
 
-
 		RequestDto requestDto = //new Gson().fromJson(json,RequestDto.class);
 				RequestDto.builder()
 				.contractId("8436131351")
-				.approverId("8049024214")
+				.approverId("2269056102")
 				.referenceNo("e8e2c8d6-97ea-11ed-a8fc-0242ac120003")
 				.remarks("Transaction Approved")
 				.build();
@@ -81,7 +80,9 @@ public class ApproveRequest  implements JavaService2{
 
 		ApproveRequestDao approveRequestDao = new ApproveRequestDao(connection);
 
-		approveRequestDao.approveRequest(requestDto);
+		requestDto =approveRequestDao.approveRequest(requestDto);
+
+		System.out.println("requestDto = " + requestDto.getResponse());
 
 		connection.commit();
 		connection.close();

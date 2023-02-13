@@ -39,8 +39,9 @@ public class CreateNewRequestDao {
 
 		try {
 
-			CallableStatement callableStatement = connection.prepareCall("{CALL "+ ApprovalConstants.GET_CONTRACT_WORKFLOW +"(?)}");
+			CallableStatement callableStatement = connection.prepareCall("{CALL "+ ApprovalConstants.GET_CONTRACT_WORKFLOW +"(?,?)}");
 			callableStatement.setString(1,requestDto.getContractId());
+			callableStatement.setString(2,requestDto.getAccountNo());
 			callableStatement.execute();
 
 			/*PreparedStatement statement = connection.prepareStatement(sqlMainQuery);
@@ -55,8 +56,8 @@ public class CreateNewRequestDao {
 				if(i==0){
 
 					String sqlString = "INSERT INTO ndc_request" +
-							"(approvalmasterid, requesterid,  status,  modifyby, remarks, referenceno, featureactionid,contractId,issequential)" +
-							"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+							"(approvalmasterid, requesterid,  status,  modifyby, remarks, referenceno, featureactionid,contractId,issequential,accountno)" +
+							"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 						PreparedStatement statementRequest = connection.prepareStatement(sqlString, Statement.RETURN_GENERATED_KEYS);
 
@@ -71,6 +72,7 @@ public class CreateNewRequestDao {
 						statementRequest.setString(7, requestDto.getFeatureActionId());
 					    statementRequest.setString(8, requestDto.getContractId());
 					    statementRequest.setInt(9, resultSet.getInt("ISSEQUENTIAL"));
+					    statementRequest.setString(10, requestDto.getAccountNo());
 
 						statementRequest.executeUpdate();
 

@@ -102,6 +102,7 @@ public class CreateApprovalMatrix implements JavaService2 {
         ApprovalRequestDto approvalRequestDto =  new Gson().fromJson(json, ApprovalRequestDto.class);
         approvalRequestDto.setUserId("4646038518");
         approvalRequestDto.setContractId("8436131351");
+        approvalRequestDto.setAccountNo("1234545667");
         approvalRequestDto.setIsSequential(0);
         approvalRequestDto.setCoreCustomerId("102190");
 

@@ -17,6 +17,7 @@ public class ApprovalRequestDto {
     private Long requestId;
     private String userId;
     private String contractId;
+    private String accountNo;
     private Integer isSequential;
     private String coreCustomerId;
     private List<ApprovalRow> approvalRowList;

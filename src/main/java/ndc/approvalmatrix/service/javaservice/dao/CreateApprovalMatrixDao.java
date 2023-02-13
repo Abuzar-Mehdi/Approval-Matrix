@@ -25,14 +25,15 @@ public class CreateApprovalMatrixDao {
         String result;
         try {
 
-            String sqlMaster ="INSERT INTO ndc_approvalmatrixmaster (CONTRACTID, USERID, ISSEQUENTIAL)" +
-                    "VALUES(?, ?, ?)";
+            String sqlMaster ="INSERT INTO ndc_approvalmatrixmaster (CONTRACTID, ACCOUNTNO,USERID, ISSEQUENTIAL)" +
+                    "VALUES(?, ?, ?, ?)";
 
             PreparedStatement statement = connection.prepareStatement(sqlMaster, Statement.RETURN_GENERATED_KEYS);
 
             statement.setString(1,approvalRequestDto.getContractId()); //ContractID
-            statement.setString(2,approvalRequestDto.getUserId()); //userid
-            statement.setInt(3,approvalRequestDto.getIsSequential()); //Sequential 1, Non-sequential 0
+            statement.setString(2,approvalRequestDto.getAccountNo()); //ContractID
+            statement.setString(3,approvalRequestDto.getUserId()); //userid
+            statement.setInt(4,approvalRequestDto.getIsSequential()); //Sequential 1, Non-sequential 0
 
             statement.executeUpdate();
 
