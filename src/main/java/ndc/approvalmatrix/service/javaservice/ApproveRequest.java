@@ -32,7 +32,7 @@ public class ApproveRequest  implements JavaService2{
 					.approverId(request.getParameter("approverId"))
 					.contractId(request.getParameter("contractId"))
 					.referenceNo(request.getParameter("referenceNo"))
-					.accountNo("accountNo")
+					.accountNo(request.getParameter("accountNo"))
 					.remarks(request.getParameter("remarks"))
 					.build();
 

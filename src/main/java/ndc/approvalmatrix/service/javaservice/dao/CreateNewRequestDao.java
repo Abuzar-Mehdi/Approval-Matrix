@@ -98,14 +98,14 @@ public class CreateNewRequestDao {
 					statement1.setString(4, resultSet.getString("APPROVALORDER"));
 					statement1.setString(5, LocalDateTime.now().toString());
 
-					if (resultSet.getString("GROUPNO").equalsIgnoreCase("1")) {
+					if (resultSet.getInt("GROUPNO") == 1) {
 						statement1.setString(6, ApprovalConstants.PENDING);
 						statement1.setString(9, ApprovalConstants.PENDING);
 						statement1.setString(11, ApprovalConstants.PENDING);
 
 					} else {
 						statement1.setString(6, ApprovalConstants.NOT_ASSIGNED);
-						statement1.setString(9, ApprovalConstants.NOT_ASSIGNED);
+						statement1.setString(9, (resultSet.getInt("SEQUENCENO") == 1 ?  ApprovalConstants.PENDING: ApprovalConstants.NOT_ASSIGNED)  );
 						statement1.setString(11, ApprovalConstants.NOT_ASSIGNED);
 					}
 

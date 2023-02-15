@@ -34,8 +34,10 @@ public class CreateNewRequest  implements JavaService2 {
 					.referenceNo(request.getParameter("referenceNo"))
 					.remarks(request.getParameter("remarks"))
 					.featureActionId(request.getParameter("featureActionId"))
-					.accountNo("accountNo")
+					.accountNo(request.getParameter("accountNo"))
 					.build();
+
+			result.addParam("data", new Gson().toJson( requestDto));
 
 			CreateNewRequestDao createNewRequestDao = new CreateNewRequestDao(connection);
 
@@ -61,14 +63,25 @@ public class CreateNewRequest  implements JavaService2 {
 
 	/*public static void main(String[] args) throws SQLException {
 
-		RequestDto requestDto = RequestDto.builder()
+		String json = "{\n" +
+				"  \"requesterId\": \"6284824056\",\n" +
+				"  \"contractId\": \"8436131351\",\n" +
+				"  \"referenceNo\": \"e8e2c8d6-97ea-11ed-a8fc-0242ac120005\",\n" +
+				"  \"featureActionId\": \"BILL_PAY_CREATE\",\n" +
+				"  \"remarks\": \"Transaction created\",\n" +
+				"  \"accountNo\": \"1234545667\"\n" +
+				"}";
+
+		RequestDto requestDto = new Gson().fromJson(json,RequestDto.class);
+
+		*//*RequestDto requestDto = RequestDto.builder()
 				.requesterId("6284824056")
 				.contractId("8436131351")
 				.accountNo("1234545667")
 				.referenceNo("e8e2c8d6-97ea-11ed-a8fc-0242ac120004")
 				.remarks("request created by 6284824056")
 				.featureActionId("BILL_PAY")
-				.build();
+				.build();*//*
 
 		Connection connection = new DatabaseConnection().getDatabaseConnection();
 		connection.setAutoCommit(false);

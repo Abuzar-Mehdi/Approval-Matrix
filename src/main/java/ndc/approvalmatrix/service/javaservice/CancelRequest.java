@@ -31,7 +31,7 @@ public class CancelRequest implements JavaService2 {
                     .contractId(request.getParameter("contractId"))
                     .referenceNo(request.getParameter("referenceNo"))
                     .remarks(request.getParameter("remarks"))
-                    .accountNo("accountNo")
+                    .accountNo(request.getParameter("accountNo"))
                     .build();
 
             CancelRequestDao cancelRequestDao = new CancelRequestDao(connection);
