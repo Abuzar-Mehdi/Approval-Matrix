@@ -34,6 +34,8 @@ public class ApprovalConstants {
 
     public static final String  REQUEST_ALREADY_CANCELED="REQUEST ALREADY CANCELED";
 
+    public static final String  REQUEST_NOT_ASSIGNED="REQUEST NOT ASSIGNED TO USER";
+
     public static final String ALL ="All Approvals";
     public static final String ANY_ONE ="Any one approval";
     public static final String ANY_TWO ="Any two approval";

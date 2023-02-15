@@ -37,7 +37,6 @@ public class CreateNewRequest  implements JavaService2 {
 					.accountNo(request.getParameter("accountNo"))
 					.build();
 
-			result.addParam("data", new Gson().toJson( requestDto));
 
 			CreateNewRequestDao createNewRequestDao = new CreateNewRequestDao(connection);
 

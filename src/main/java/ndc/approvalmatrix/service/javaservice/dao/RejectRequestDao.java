@@ -30,7 +30,7 @@ public class RejectRequestDao {
             PreparedStatement statementS = connection.prepareStatement(sqlRequest);
 
             statementS.setString(1,requestDto.getContractId());
-            statementS.setString(2,requestDto.getAccountNo());
+            statementS.setString(2, requestDto.getAccountNo());
             statementS.setString(3,requestDto.getApproverId());
             statementS.setString(4,requestDto.getReferenceNo());
 

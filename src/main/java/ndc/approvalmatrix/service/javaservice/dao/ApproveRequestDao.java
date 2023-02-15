@@ -34,7 +34,7 @@ public class ApproveRequestDao {
             PreparedStatement statementS = connection.prepareStatement(sqlRequest);
 
             statementS.setString(1,requestDto.getContractId());
-            statementS.setString(2,requestDto.getAccountNo());
+            statementS.setString(2, requestDto.getAccountNo());
             statementS.setString(3,requestDto.getApproverId());
             statementS.setString(4,requestDto.getReferenceNo());
 
@@ -310,13 +310,16 @@ public class ApproveRequestDao {
 
                         requestDto.setResponse(ApprovalConstants.REQUEST_ALREADY_APPROVED);
                     }
+                    else if(resultSet.getString("STATUS").equalsIgnoreCase(ApprovalConstants.IN_PROGRESS) &&  resultSet.getString("SEQSTATUS").equalsIgnoreCase(ApprovalConstants.PENDING)  && resultSet.getString("GROUPSTATUS").equalsIgnoreCase(ApprovalConstants.NOT_ASSIGNED) ){
+
+                        requestDto.setResponse(ApprovalConstants.REQUEST_NOT_ASSIGNED);
+                    }
 
                 }
 
             }else{
 
                 requestDto.setResponse(ApprovalConstants.NO_REQUEST_FOUND);
-
             }
 
 
