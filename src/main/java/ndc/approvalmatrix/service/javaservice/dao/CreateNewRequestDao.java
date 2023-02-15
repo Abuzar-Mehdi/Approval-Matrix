@@ -63,9 +63,7 @@ public class CreateNewRequestDao {
 
 						statementRequest.setLong(1,resultSet.getLong("ID"));
 						statementRequest.setLong(2, resultSet.getLong("USERID"));
-						//statementRequest.setString(3, LocalDateTime.now().toString());
 						statementRequest.setString(3, ApprovalConstants.IN_PROGRESS);
-						//statementRequest.setString(5, LocalDateTime.now().toString());
 						statementRequest.setLong(4, resultSet.getLong("USERID"));
 						statementRequest.setString(5, requestDto.getRemarks());
 						statementRequest.setString(6, requestDto.getReferenceNo());
@@ -88,7 +86,7 @@ public class CreateNewRequestDao {
 
 				String sqlWorkflow = "INSERT INTO ndc_requestworkflow" +
 						"(requestid, approverid, sequenceno, approverorder, approvedate, status, remarks, rulevalue, seqstatus,groupno,groupstatus)" +
-						"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
+						"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 				PreparedStatement statement1 = connection.prepareStatement(sqlWorkflow);
 
@@ -100,7 +98,7 @@ public class CreateNewRequestDao {
 					statement1.setString(4, resultSet.getString("APPROVALORDER"));
 					statement1.setString(5, LocalDateTime.now().toString());
 
-					if (resultSet.getString("SEQUENCENO").equalsIgnoreCase("1")) {
+					if (resultSet.getString("GROUPNO").equalsIgnoreCase("1")) {
 						statement1.setString(6, ApprovalConstants.PENDING);
 						statement1.setString(9, ApprovalConstants.PENDING);
 						statement1.setString(11, ApprovalConstants.PENDING);

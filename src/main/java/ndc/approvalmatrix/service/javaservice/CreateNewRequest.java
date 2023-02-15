@@ -34,6 +34,7 @@ public class CreateNewRequest  implements JavaService2 {
 					.referenceNo(request.getParameter("referenceNo"))
 					.remarks(request.getParameter("remarks"))
 					.featureActionId(request.getParameter("featureActionId"))
+					.accountNo("accountNo")
 					.build();
 
 			CreateNewRequestDao createNewRequestDao = new CreateNewRequestDao(connection);
@@ -58,13 +59,13 @@ public class CreateNewRequest  implements JavaService2 {
 	}
 
 
-	public static void main(String[] args) throws SQLException {
+	/*public static void main(String[] args) throws SQLException {
 
 		RequestDto requestDto = RequestDto.builder()
 				.requesterId("6284824056")
 				.contractId("8436131351")
 				.accountNo("1234545667")
-				.referenceNo("e8e2c8d6-97ea-11ed-a8fc-0242ac120003")
+				.referenceNo("e8e2c8d6-97ea-11ed-a8fc-0242ac120004")
 				.remarks("request created by 6284824056")
 				.featureActionId("BILL_PAY")
 				.build();
@@ -80,5 +81,5 @@ public class CreateNewRequest  implements JavaService2 {
 
 		connection.commit();
 		connection.close();
-	}
+	}*/
 }

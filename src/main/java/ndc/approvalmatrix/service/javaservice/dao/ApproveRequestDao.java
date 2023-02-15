@@ -48,7 +48,7 @@ public class ApproveRequestDao {
                 requestDto.setSequenceNo(resultSet.getInt("SEQUENCENO"));
                 requestDto.setGroupNo(resultSet.getInt("GROUPNO"));
 
-                if (resultSet.getString("STATUS").equalsIgnoreCase(ApprovalConstants.IN_PROGRESS) && resultSet.getString("SEQSTATUS").equalsIgnoreCase(ApprovalConstants.PENDING) && resultSet.getString("APPROVERSTATUS").equalsIgnoreCase(ApprovalConstants.PENDING) && (resultSet.getInt("ISSEQUENTIAL") == 1 || resultSet.getString("GROUPSTATUS").equalsIgnoreCase(ApprovalConstants.PENDING)) ) {
+                if (resultSet.getString("STATUS").equalsIgnoreCase(ApprovalConstants.IN_PROGRESS) && resultSet.getString("SEQSTATUS").equalsIgnoreCase(ApprovalConstants.PENDING) && resultSet.getString("APPROVERSTATUS").equalsIgnoreCase(ApprovalConstants.PENDING) && resultSet.getString("GROUPSTATUS").equalsIgnoreCase(ApprovalConstants.PENDING) ) {
 
 
                     /// UPDATING REQUEST WORK FLOW STATUS ///
@@ -82,7 +82,8 @@ public class ApproveRequestDao {
                     callableStatement.setInt(3, requestDto.getSequenceNo());
                     callableStatement.setInt(4, requestDto.getGroupNo());
                     callableStatement.setInt(5, requestDto.getRuleValue());
-                    callableStatement.setInt(6, resultSet.getInt("ISSEQUENTIAL"));
+                    callableStatement.setInt(6, 0);
+                    //callableStatement.setInt(6, resultSet.getInt("ISSEQUENTIAL"));
                     callableStatement.execute();
 
                     ResultSet resultSet2 =callableStatement.getResultSet();
@@ -94,25 +95,63 @@ public class ApproveRequestDao {
 
                             /* SEQUENTIAL */
 
-                            // Updating Sequence Status //
+                            // Updating group Status //
 
-                            String sqlAssignToNextApprove = "UPDATE ndc_requestworkflow SET  SEQSTATUS=? WHERE REQUESTID=? AND SEQUENCENO=? ";
+                            String sqlAssignToNextApprove = "UPDATE ndc_requestworkflow SET  GROUPSTATUS=? WHERE REQUESTID=? AND SEQUENCENO=? AND  GROUPNO=?  ";
                             PreparedStatement statement = connection.prepareStatement(sqlAssignToNextApprove);
                             statement.setString(1, ApprovalConstants.APPROVED);
                             statement.setLong(2, requestDto.getRequestId());
-                            statement.setInt(3, requestDto.getSequenceNo());
+                            statement.setLong(3, requestDto.getSequenceNo());
+                            statement.setInt(4, requestDto.getGroupNo());
 
                             statement.executeUpdate();
 
-                            // ASSIGN TO NEXT APPROVER //
+                            CallableStatement callableStatement1 = connection.prepareCall("{CALL "+ ApprovalConstants.GET_NON_SEQ_STATUS +"(?,?,?)}");
 
-                            int nextSequence = requestDto.getSequenceNo();
-                            String sqlAssignToNextApprove1 = "UPDATE ndc_requestworkflow SET  STATUS=? , SEQSTATUS=?  WHERE REQUESTID=? AND SEQUENCENO=? ";
-                            PreparedStatement statement2 = connection.prepareStatement(sqlAssignToNextApprove1);
-                            statement2.setString(1, ApprovalConstants.PENDING);
-                            statement2.setString(2, ApprovalConstants.PENDING);
-                            statement2.setLong(3, requestDto.getRequestId());
-                            statement2.setInt(4, ++nextSequence);
+                            callableStatement1.setLong(1, requestDto.getRequestId());
+                            callableStatement1.setString(2, ApprovalConstants.APPROVED);
+                            callableStatement1.setInt(3, requestDto.getSequenceNo());
+
+                            callableStatement1.execute();
+
+                            ResultSet resultSet3 = callableStatement1.getResultSet();
+
+                            if (resultSet3.next()) {
+
+
+                                String sqlAssignToNextApprove1 = "UPDATE ndc_requestworkflow SET  SEQSTATUS=? WHERE REQUESTID=? AND SEQUENCENO=? ";
+                                PreparedStatement statement2 = connection.prepareStatement(sqlAssignToNextApprove1);
+                                statement2.setString(1, ApprovalConstants.APPROVED);
+                                statement2.setLong(2, requestDto.getRequestId());
+                                statement2.setInt(3, requestDto.getSequenceNo());
+
+                                statement2.executeUpdate();
+
+                                String sqlAssignToNextApprover2 = "UPDATE ndc_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?   WHERE ID=?";
+                                PreparedStatement statement3 = connection.prepareStatement(sqlAssignToNextApprover2);
+                                statement3.setString(1, ApprovalConstants.APPROVED);
+                                statement3.setString(2, requestDto.getRemarks());
+                                statement3.setString(3, LocalDateTime.now().toString());
+                                statement3.setString(4, requestDto.getApproverId());
+                                statement3.setLong(5, requestDto.getRequestId());
+
+                                statement3.executeUpdate();
+
+                                requestDto.setStatus(ApprovalConstants.APPROVED);
+                                requestDto.setResponse(ApprovalConstants.REQUEST_APPROVED_SUCCESSFULLY);
+
+                            }
+                            else {
+
+                                int nextGroup = requestDto.getGroupNo();
+                                String sqlAssignToNextApprove1 = "UPDATE ndc_requestworkflow SET  STATUS=? , GROUPSTATUS=? ,SEQSTATUS=?  WHERE REQUESTID=? AND SEQUENCENO=? AND GROUPNO=? ";
+                                PreparedStatement statement2 = connection.prepareStatement(sqlAssignToNextApprove1);
+                                statement2.setString(1, ApprovalConstants.PENDING);
+                                statement2.setString(2, ApprovalConstants.PENDING);
+                                statement2.setString(3, ApprovalConstants.PENDING);
+                                statement2.setLong(4, requestDto.getRequestId());
+                                statement2.setInt(5, requestDto.getSequenceNo());
+                                statement2.setInt(6,++nextGroup );
 
                             if (statement2.executeUpdate() >= 1) {
 
@@ -144,6 +183,21 @@ public class ApproveRequestDao {
                                 requestDto.setStatus(ApprovalConstants.APPROVED);
                                 requestDto.setResponse(ApprovalConstants.REQUEST_APPROVED_SUCCESSFULLY);
 
+                            }
+
+
+                                String sqlAssignToNextApprover2 = "UPDATE ndc_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?  WHERE ID=?";
+                                PreparedStatement statement3 = connection.prepareStatement(sqlAssignToNextApprover2);
+                                statement3.setString(1, ApprovalConstants.IN_PROGRESS);
+                                statement3.setString(2, requestDto.getRemarks());
+                                statement3.setString(3, LocalDateTime.now().toString());
+                                statement3.setString(4, requestDto.getApproverId());
+                                statement3.setLong(5, requestDto.getRequestId());
+
+                                statement3.executeUpdate();
+
+                                requestDto.setStatus(ApprovalConstants.IN_PROGRESS);
+                                requestDto.setResponse(ApprovalConstants.REQUEST_PENDING_FROM_OTHER_APPROVERS);
                             }
 
                         } else {

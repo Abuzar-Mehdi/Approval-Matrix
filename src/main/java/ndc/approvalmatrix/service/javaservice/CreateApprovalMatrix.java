@@ -75,6 +75,7 @@ public class CreateApprovalMatrix implements JavaService2 {
             approvalRequestDto.setContractId(dataControllerRequest.getParameter("contractId"));
             approvalRequestDto.setIsSequential(Integer.valueOf(dataControllerRequest.getParameter("isSequential")));
             approvalRequestDto.setCoreCustomerId(dataControllerRequest.getParameter("coreCustomerId"));
+            approvalRequestDto.setAccountNo(dataControllerRequest.getParameter("accountNo"));
 
             CreateApprovalMatrixDao approvalMatrixDao = new CreateApprovalMatrixDao(connection);
             result.addParam("data", approvalMatrixDao.createApprovalMatrix(approvalRequestDto));
@@ -92,7 +93,7 @@ public class CreateApprovalMatrix implements JavaService2 {
         return result;
     }
 
-    public static void main(String[] args) throws  SQLException {
+   /* public static void main(String[] args) throws  SQLException {
 
 
         Connection connection = new DatabaseConnection().getDatabaseConnection();
@@ -103,7 +104,7 @@ public class CreateApprovalMatrix implements JavaService2 {
         approvalRequestDto.setUserId("4646038518");
         approvalRequestDto.setContractId("8436131351");
         approvalRequestDto.setAccountNo("1234545667");
-        approvalRequestDto.setIsSequential(0);
+        approvalRequestDto.setIsSequential(1);
         approvalRequestDto.setCoreCustomerId("102190");
 
         System.out.println("approvalRowList = " + approvalRequestDto);
@@ -115,6 +116,6 @@ public class CreateApprovalMatrix implements JavaService2 {
 
         connection.commit();
         connection.close();
-    }
+    }*/
 
 }

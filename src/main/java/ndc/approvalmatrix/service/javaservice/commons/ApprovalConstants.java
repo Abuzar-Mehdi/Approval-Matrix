@@ -63,6 +63,6 @@ public class ApprovalConstants {
 
     public static final String GET_GROUP_STATUS="ndc_getgroupapprovalstatus";
 
-    public static final String GET_NON_SEQ_STATUS="ndc_getnonseqapprovalstatus";
+    public static final String GET_NON_SEQ_STATUS="ndc_getsequenceapprovalstatus";
 
 }

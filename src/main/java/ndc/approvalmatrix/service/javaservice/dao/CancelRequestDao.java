@@ -30,7 +30,7 @@ public class CancelRequestDao {
         try {
 
 
-            String sqlWorkFlow="SELECT * FROM ndc_request WHERE  CONTRACTID=? AND REFERENCENO=? AND  SOFTDELETE=0 ";
+            String sqlWorkFlow="SELECT * FROM ndc_request WHERE  CONTRACTID=? AND  REFERENCENO=? AND  SOFTDELETE=0 ";
 
             PreparedStatement statement = connection.prepareStatement(sqlWorkFlow);
 

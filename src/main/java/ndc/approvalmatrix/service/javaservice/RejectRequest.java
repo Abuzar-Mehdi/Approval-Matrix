@@ -33,6 +33,7 @@ public class RejectRequest implements JavaService2 {
 					.contractId(request.getParameter("contractId"))
 					.referenceNo(request.getParameter("referenceNo"))
 					.remarks(request.getParameter("remarks"))
+					.accountNo("accountNo")
 					.build();
 
 			RejectRequestDao rejectRequestDao = new RejectRequestDao(connection);

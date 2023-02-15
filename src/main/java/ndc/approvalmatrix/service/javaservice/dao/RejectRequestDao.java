@@ -41,7 +41,7 @@ public class RejectRequestDao {
                 requestDto.setRequestId(resultSet.getLong("ID"));
                 requestDto.setSequenceNo( resultSet.getInt("SEQUENCENO"));
 
-                if(resultSet.getString("STATUS").equalsIgnoreCase(ApprovalConstants.IN_PROGRESS) && resultSet.getString("SEQSTATUS").equalsIgnoreCase(ApprovalConstants.PENDING) && ( resultSet.getInt("ISSEQUENTIAL") == 1 || resultSet.getString("GROUPSTATUS").equalsIgnoreCase(ApprovalConstants.PENDING) ) ) {
+                if(resultSet.getString("STATUS").equalsIgnoreCase(ApprovalConstants.IN_PROGRESS) && resultSet.getString("SEQSTATUS").equalsIgnoreCase(ApprovalConstants.PENDING) &&  resultSet.getString("GROUPSTATUS").equalsIgnoreCase(ApprovalConstants.PENDING)  ) {
 
                     if(resultSet.getString("APPROVERSTATUS").equalsIgnoreCase(ApprovalConstants.PENDING)) {
 
