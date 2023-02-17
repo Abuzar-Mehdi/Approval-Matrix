@@ -33,8 +33,8 @@ public class FeatureActionConfigDao {
             if(featureActionConfigDto.getIsInsert() == 1) {
 
                 String sql = "INSERT INTO ndc_featureactionconfig" +
-                        "(featureactionid, name, contractid, createby, createdate, modifyby, modifydate,isenabled)" +
-                        "VALUES(?, ?, ?, ?, ?, ?, ?,?)";
+                        "(featureactionid, name, contractid, createby, createdate, modifyby, modifydate,isenabled,accountno,minamount,maxamount)" +
+                        "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
                 preparedStatement = connection.prepareStatement(sql);
 
@@ -48,6 +48,10 @@ public class FeatureActionConfigDao {
                     preparedStatement.setString(6, featureActionConfigDto.getModifyBy());
                     preparedStatement.setString(7, LocalDate.now().toString());
                     preparedStatement.setInt(8, featureAction.getIsEnabled());
+
+                    preparedStatement.setString(9, featureActionConfigDto.getAccountNo());
+                    preparedStatement.setBigDecimal(10, featureAction.getMinAmount());
+                    preparedStatement.setBigDecimal(11, featureAction.getMaxAmount());
 
                     preparedStatement.addBatch();
 
@@ -63,7 +67,7 @@ public class FeatureActionConfigDao {
             }else {
 
                 String sql = "UPDATE ndc_featureactionconfig" +
-                        "SET featureactionid=?, name=?,  modifyby='', modifydate=, isenabled=?" +
+                        " SET featureactionid=?, name=?,  modifyby=?, modifydate=?, isenabled=? , accountno=? , minAmount=? , maxAmount=? " +
                         "WHERE contractid=? and featureactionid=?";
 
                 preparedStatement = connection.prepareStatement(sql);
@@ -75,8 +79,12 @@ public class FeatureActionConfigDao {
                     preparedStatement.setString(3, featureActionConfigDto.getModifyBy());
                     preparedStatement.setString(4, LocalDate.now().toString());
                     preparedStatement.setInt(5, featureAction.getIsEnabled());
-                    preparedStatement.setString(6, featureActionConfigDto.getContractId());
-                    preparedStatement.setString(7, featureAction.getFeatureActionId());
+                    preparedStatement.setString(6, featureActionConfigDto.getAccountNo());
+                    preparedStatement.setBigDecimal(7, featureAction.getMinAmount());
+                    preparedStatement.setBigDecimal(8, featureAction.getMaxAmount());
+
+                    preparedStatement.setString(9, featureActionConfigDto.getContractId());
+                    preparedStatement.setString(10, featureAction.getFeatureActionId());
 
                     preparedStatement.addBatch();
 

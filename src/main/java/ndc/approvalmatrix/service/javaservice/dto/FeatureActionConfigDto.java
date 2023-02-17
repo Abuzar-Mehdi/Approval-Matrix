@@ -15,5 +15,6 @@ public class FeatureActionConfigDto {
     private String createBy;
     private String modifyBy;
     private Integer isInsert ;
+    private String accountNo;
     private List<FeatureAction> featureActions;
 }
