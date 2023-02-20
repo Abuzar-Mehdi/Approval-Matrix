@@ -1,5 +1,7 @@
 package ndc.approvalmatrix.service.javaservice;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -35,6 +37,7 @@ public class CreateNewRequest  implements JavaService2 {
 					.remarks(request.getParameter("remarks"))
 					.featureActionId(request.getParameter("featureActionId"))
 					.accountNo(request.getParameter("accountNo"))
+					.amount(Double.valueOf(request.getParameter("amount")))
 					.build();
 
 
@@ -60,7 +63,7 @@ public class CreateNewRequest  implements JavaService2 {
 	}
 
 
-	/*public static void main(String[] args) throws SQLException {
+	public static void main(String[] args) throws SQLException {
 
 		String json = "{\n" +
 				"  \"requesterId\": \"6284824056\",\n" +
@@ -71,16 +74,17 @@ public class CreateNewRequest  implements JavaService2 {
 				"  \"accountNo\": \"1234545667\"\n" +
 				"}";
 
-		RequestDto requestDto = new Gson().fromJson(json,RequestDto.class);
+		//RequestDto requestDto = new Gson().fromJson(json,RequestDto.class);
 
-		*//*RequestDto requestDto = RequestDto.builder()
+		RequestDto requestDto = RequestDto.builder()
 				.requesterId("6284824056")
 				.contractId("8436131351")
 				.accountNo("1234545667")
 				.referenceNo("e8e2c8d6-97ea-11ed-a8fc-0242ac120004")
 				.remarks("request created by 6284824056")
-				.featureActionId("BILL_PAY")
-				.build();*//*
+				.featureActionId("BILL_PAY_CREATE")
+				.amount(9999999d)
+				.build();
 
 		Connection connection = new DatabaseConnection().getDatabaseConnection();
 		connection.setAutoCommit(false);
@@ -90,8 +94,9 @@ public class CreateNewRequest  implements JavaService2 {
 		CreateNewRequestDao createNewRequestDao = new CreateNewRequestDao(connection);
 
 		createNewRequestDao.createNewRequest(requestDto);
+		System.out.println("requestDto = " + requestDto.getResponse());
 
 		connection.commit();
 		connection.close();
-	}*/
+	}
 }

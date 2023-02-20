@@ -36,6 +36,8 @@ public class ApprovalConstants {
 
     public static final String  REQUEST_NOT_ASSIGNED="REQUEST NOT ASSIGNED TO USER";
 
+    public static final String  REQUEST_CANNOT_CREATE="REQUEST NOT CREATED DUE TO TRANSACTION LIMIT GREATER THAN APPROVER LIMITS";
+
     public static final String ALL ="All Approvals";
     public static final String ANY_ONE ="Any one approval";
     public static final String ANY_TWO ="Any two approval";
@@ -66,5 +68,7 @@ public class ApprovalConstants {
     public static final String GET_GROUP_STATUS="ndc_getgroupapprovalstatus";
 
     public static final String GET_NON_SEQ_STATUS="ndc_getsequenceapprovalstatus";
+
+    public static final String GET_FEATUREACTION_APPROVER_LIMIT ="ndc_getapproverfeatureactionlimiagainstcontractaccount";
 
 }

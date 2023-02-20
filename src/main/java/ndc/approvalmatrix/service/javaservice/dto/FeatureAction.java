@@ -15,6 +15,4 @@ public class FeatureAction {
     private String featureActionId;
     private String name;
     private Integer isEnabled;
-    private BigDecimal minAmount;
-    private BigDecimal maxAmount;
 }

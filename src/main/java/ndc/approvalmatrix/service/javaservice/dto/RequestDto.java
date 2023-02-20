@@ -2,7 +2,8 @@ package ndc.approvalmatrix.service.javaservice.dto;
 
 import lombok.*;
 
-import java.util.Date;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 
 @AllArgsConstructor
@@ -26,4 +27,5 @@ public class RequestDto {
     private String response;
 	private String assignDate;
 	private String accountNo;
+	private Double amount;
 }
