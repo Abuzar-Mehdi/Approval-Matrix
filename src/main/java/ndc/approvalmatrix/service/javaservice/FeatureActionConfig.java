@@ -71,25 +71,25 @@ public class FeatureActionConfig implements JavaService2 {
         return result;
     }
 
-    public static void main(String[] args) throws SQLException {
-
-
-        Connection connection = new DatabaseConnection().getDatabaseConnection();
-        connection.setAutoCommit(false);
-
-        FeatureActionConfigDto featureActionConfigDto = new Gson().fromJson(json, FeatureActionConfigDto.class);
-
-        featureActionConfigDto.setContractId("8436131351");
-        featureActionConfigDto.setCreateBy("11883");
-        featureActionConfigDto.setModifyBy("11883");
-        featureActionConfigDto.setIsInsert(0);
-        featureActionConfigDto.setAccountNo("1234545667");
-
-        FeatureActionConfigDao featureActionConfigDao = new FeatureActionConfigDao(connection);
-        //result.addParam("data", featureActionConfigDao.createFeatureActionConfiguration(featureActionConfigDto));
-
-        System.out.println("featureActionConfigDao = " + featureActionConfigDao.createFeatureActionConfiguration(featureActionConfigDto));
-        connection.commit();
-        connection.close();
-    }
+//    public static void main(String[] args) throws SQLException {
+//
+//
+//        Connection connection = new DatabaseConnection().getDatabaseConnection();
+//        connection.setAutoCommit(false);
+//
+//        FeatureActionConfigDto featureActionConfigDto = new Gson().fromJson(json, FeatureActionConfigDto.class);
+//
+//        featureActionConfigDto.setContractId("8436131351");
+//        featureActionConfigDto.setCreateBy("11883");
+//        featureActionConfigDto.setModifyBy("11883");
+//        featureActionConfigDto.setIsInsert(0);
+//        featureActionConfigDto.setAccountNo("1234545667");
+//
+//        FeatureActionConfigDao featureActionConfigDao = new FeatureActionConfigDao(connection);
+//        //result.addParam("data", featureActionConfigDao.createFeatureActionConfiguration(featureActionConfigDto));
+//
+//        System.out.println("featureActionConfigDao = " + featureActionConfigDao.createFeatureActionConfiguration(featureActionConfigDto));
+//        connection.commit();
+//        connection.close();
+//    }
 }

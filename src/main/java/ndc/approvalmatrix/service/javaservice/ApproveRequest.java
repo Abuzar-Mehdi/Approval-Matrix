@@ -59,29 +59,29 @@ public class ApproveRequest  implements JavaService2{
 		return result;
 	}
 
-	public static void main(String[] args) throws SQLException {
-
-
-
-		RequestDto requestDto =	RequestDto.builder()
-				.contractId("8436131351")
-				.approverId("4111935994")
-						.accountNo("1234545667")
-				.referenceNo("e8e2c8d6-97ea-11ed-a8fc-0242ac120011")
-				.remarks("Transaction Approved")
-				.build();
-
-		Connection connection = new DatabaseConnection().getDatabaseConnection();
-		connection.setAutoCommit(false);
-
-		ApproveRequestDao approveRequestDao = new ApproveRequestDao(connection);
-
-		requestDto =approveRequestDao.approveRequest(requestDto);
-
-		System.out.println("requestDto = " + requestDto.getResponse());
-
-		connection.commit();
-		connection.close();
-	}
+//	public static void main(String[] args) throws SQLException {
+//
+//
+//
+//		RequestDto requestDto =	RequestDto.builder()
+//				.contractId("8436131351")
+//				.approverId("4111935994")
+//						.accountNo("1234545667")
+//				.referenceNo("e8e2c8d6-97ea-11ed-a8fc-0242ac120011")
+//				.remarks("Transaction Approved")
+//				.build();
+//
+//		Connection connection = new DatabaseConnection().getDatabaseConnection();
+//		connection.setAutoCommit(false);
+//
+//		ApproveRequestDao approveRequestDao = new ApproveRequestDao(connection);
+//
+//		requestDto =approveRequestDao.approveRequest(requestDto);
+//
+//		System.out.println("requestDto = " + requestDto.getResponse());
+//
+//		connection.commit();
+//		connection.close();
+//	}
 
 }

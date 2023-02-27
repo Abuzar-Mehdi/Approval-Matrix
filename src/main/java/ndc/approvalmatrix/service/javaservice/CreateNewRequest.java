@@ -63,41 +63,41 @@ public class CreateNewRequest  implements JavaService2 {
 	}
 
 
-	public static void main(String[] args) throws SQLException {
-
-		String json = "{\n" +
-				"  \"requesterId\": \"6284824056\",\n" +
-				"  \"contractId\": \"8436131351\",\n" +
-				"  \"referenceNo\": \"e8e2c8d6-97ea-11ed-a8fc-0242ac120005\",\n" +
-				"  \"featureActionId\": \"BILL_PAY_CREATE\",\n" +
-				"  \"remarks\": \"Transaction created\",\n" +
-				"  \"accountNo\": \"1234545667\"\n" +
-				"}";
-
-		//RequestDto requestDto = new Gson().fromJson(json,RequestDto.class);
-
-		RequestDto requestDto = RequestDto.builder()
-				.requesterId("6284824056")
-				.contractId("8436131351")
-				.accountNo("1234545667")
-				.referenceNo("e8e2c8d6-97ea-11ed-a8fc-0242ac120011")
-				.remarks("request created by 6284824056")
-				.featureActionId("BILL_PAY_CREATE")
-				.amount(5000d)
-				.coreCustomerId("102190")
-				.build();
-
-		Connection connection = new DatabaseConnection().getDatabaseConnection();
-		connection.setAutoCommit(false);
-
-		//RequestDto requestDto = new Gson().fromJson(request.getParameter("data"), RequestDto.class);
-
-		CreateNewRequestDao createNewRequestDao = new CreateNewRequestDao(connection);
-
-		createNewRequestDao.createNewRequest(requestDto);
-		System.out.println("requestDto = " + requestDto.getResponse());
-
-		connection.commit();
-		connection.close();
-	}
+//	public static void main(String[] args) throws SQLException {
+//
+//		String json = "{\n" +
+//				"  \"requesterId\": \"6284824056\",\n" +
+//				"  \"contractId\": \"8436131351\",\n" +
+//				"  \"referenceNo\": \"e8e2c8d6-97ea-11ed-a8fc-0242ac120005\",\n" +
+//				"  \"featureActionId\": \"BILL_PAY_CREATE\",\n" +
+//				"  \"remarks\": \"Transaction created\",\n" +
+//				"  \"accountNo\": \"1234545667\"\n" +
+//				"}";
+//
+//		//RequestDto requestDto = new Gson().fromJson(json,RequestDto.class);
+//
+//		RequestDto requestDto = RequestDto.builder()
+//				.requesterId("6284824056")
+//				.contractId("8436131351")
+//				.accountNo("1234545667")
+//				.referenceNo("e8e2c8d6-97ea-11ed-a8fc-0242ac120011")
+//				.remarks("request created by 6284824056")
+//				.featureActionId("BILL_PAY_CREATE")
+//				.amount(5000d)
+//				.coreCustomerId("102190")
+//				.build();
+//
+//		Connection connection = new DatabaseConnection().getDatabaseConnection();
+//		connection.setAutoCommit(false);
+//
+//		//RequestDto requestDto = new Gson().fromJson(request.getParameter("data"), RequestDto.class);
+//
+//		CreateNewRequestDao createNewRequestDao = new CreateNewRequestDao(connection);
+//
+//		createNewRequestDao.createNewRequest(requestDto);
+//		System.out.println("requestDto = " + requestDto.getResponse());
+//
+//		connection.commit();
+//		connection.close();
+//	}
 }

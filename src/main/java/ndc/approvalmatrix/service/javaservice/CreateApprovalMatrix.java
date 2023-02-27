@@ -180,29 +180,29 @@ public class CreateApprovalMatrix implements JavaService2 {
         return result;
     }
 
-    public static void main(String[] args) throws  SQLException {
-
-
-        Connection connection = new DatabaseConnection().getDatabaseConnection();
-        connection.setAutoCommit(false);         ;
-
-
-        ApprovalRequestDto approvalRequestDto =  new Gson().fromJson(json3, ApprovalRequestDto.class);
-//        approvalRequestDto.setUserId("4646038518");
-//        approvalRequestDto.setContractId("8436131351");
-//        approvalRequestDto.setAccountNo("1234545667");
-//        approvalRequestDto.setIsSequential(1);
-//        approvalRequestDto.setCoreCustomerId("102190");
-
-        System.out.println("approvalRowList = " + new Gson().toJson(approvalRequestDto));
-
-        CreateApprovalMatrixDao approvalMatrixDao = new CreateApprovalMatrixDao(connection);
-        String Message = approvalMatrixDao.createApprovalMatrix(approvalRequestDto);
-
-        System.out.println("Message = " + Message);
-
-        connection.commit();
-        connection.close();
-    }
+//    public static void main(String[] args) throws  SQLException {
+//
+//
+//        Connection connection = new DatabaseConnection().getDatabaseConnection();
+//        connection.setAutoCommit(false);         ;
+//
+//
+//        ApprovalRequestDto approvalRequestDto =  new Gson().fromJson(json3, ApprovalRequestDto.class);
+////        approvalRequestDto.setUserId("4646038518");
+////        approvalRequestDto.setContractId("8436131351");
+////        approvalRequestDto.setAccountNo("1234545667");
+////        approvalRequestDto.setIsSequential(1);
+////        approvalRequestDto.setCoreCustomerId("102190");
+//
+//        System.out.println("approvalRowList = " + new Gson().toJson(approvalRequestDto));
+//
+//        CreateApprovalMatrixDao approvalMatrixDao = new CreateApprovalMatrixDao(connection);
+//        String Message = approvalMatrixDao.createApprovalMatrix(approvalRequestDto);
+//
+//        System.out.println("Message = " + Message);
+//
+//        connection.commit();
+//        connection.close();
+//    }
 
 }
