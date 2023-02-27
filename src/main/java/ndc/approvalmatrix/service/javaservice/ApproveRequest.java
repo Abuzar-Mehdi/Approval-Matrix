@@ -59,26 +59,17 @@ public class ApproveRequest  implements JavaService2{
 		return result;
 	}
 
-	/*public static void main(String[] args) throws SQLException {
-
-		 String json ="{\n" +
-				 "  \"approverId\": \"618323004924214\",\n" +
-				 "  \"contractId\": \"8436131351\",\n" +
-				 "  \"referenceNo\": \"e8e2c8d6-97ea-11ed-a8fc-0242ac120006\",\n" +
-				 "  \"remarks\": \"Transaction Approved\",\n" +
-				 "  \"accountNo\": \"1234545667\"\n" +
-				 "}";
-
-		RequestDto requestDto = new Gson().fromJson(json,RequestDto.class);
+	public static void main(String[] args) throws SQLException {
 
 
-				*//*RequestDto.builder()
+
+		RequestDto requestDto =	RequestDto.builder()
 				.contractId("8436131351")
 				.approverId("4111935994")
 						.accountNo("1234545667")
-				.referenceNo("e8e2c8d6-97ea-11ed-a8fc-0242ac120004")
+				.referenceNo("e8e2c8d6-97ea-11ed-a8fc-0242ac120011")
 				.remarks("Transaction Approved")
-				.build();*//*
+				.build();
 
 		Connection connection = new DatabaseConnection().getDatabaseConnection();
 		connection.setAutoCommit(false);
@@ -91,6 +82,6 @@ public class ApproveRequest  implements JavaService2{
 
 		connection.commit();
 		connection.close();
-	}*/
+	}
 
 }

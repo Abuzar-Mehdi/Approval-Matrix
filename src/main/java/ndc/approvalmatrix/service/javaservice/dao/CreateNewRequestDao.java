@@ -27,48 +27,55 @@ public class CreateNewRequestDao {
 		try {
 
 
-			CallableStatement callableStatement = connection.prepareCall("{CALL " + ApprovalConstants.GET_FEATUREACTION_APPROVER_LIMIT + "(?,?,?,?,?)}");
+			CallableStatement callableStatement = connection.prepareCall("{CALL " + ApprovalConstants.GET_FEATUREACTION_APPROVER_LIMIT + "(?,?,?,?)}");
 			callableStatement.setString(1, requestDto.getContractId());
 			callableStatement.setString(2, requestDto.getAccountNo());
 			callableStatement.setString(3, requestDto.getFeatureActionId());
 			callableStatement.setDouble(4, requestDto.getAmount());
-			callableStatement.registerOutParameter(5, java.sql.Types.INTEGER);
+
 			callableStatement.execute();
 
-			//ResultSet resultSet = callableStatement.getResultSet();
+			ResultSet resultSetx = callableStatement.getResultSet();
 
-			if(callableStatement.getInt(5) == 1) {
+			if(resultSetx.next()) {
 
-				CallableStatement callableStatement1 = connection.prepareCall("{CALL " + ApprovalConstants.GET_CONTRACT_WORKFLOW + "(?,?)}");
+				requestDto.setWorkflowId(resultSetx.getInt("workflowid"));
+				requestDto.setIsSequential(	resultSetx.getInt("issequential"));
+
+				int i = 0;
+				CallableStatement callableStatement1 = connection.prepareCall("{CALL " + ApprovalConstants.GET_CONTRACT_WORKFLOW + "(?,?,?)}");
 				callableStatement1.setString(1, requestDto.getContractId());
 				callableStatement1.setString(2, requestDto.getAccountNo());
+				callableStatement1.setInt(3, requestDto.getWorkflowId());
 				callableStatement1.execute();
 
 
 				ResultSet resultSet = callableStatement1.getResultSet();
 
-				int i = 0;
 
 				while (resultSet.next()) {
 
+					System.out.println("resultSet.getString(\"role\") = " + resultSet.getString("role"));
+					
 					if (i == 0) {
 
-						String sqlString = "INSERT INTO ndc_request" +
-								"(approvalmasterid, requesterid,  status,  modifyby, remarks, referenceno, featureactionid,contractId,issequential,accountno)" +
-								"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+						String sqlString = "INSERT INTO ndc_am_request" +
+								"(matrixid, requesterid,  status,  modifyby, remarks, referenceno, featureactionid,contractId,issequential,accountno,workflowid)" +
+								"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 						PreparedStatement statementRequest = connection.prepareStatement(sqlString, Statement.RETURN_GENERATED_KEYS);
 
 						statementRequest.setLong(1, resultSet.getLong("ID"));
-						statementRequest.setLong(2, resultSet.getLong("USERID"));
+						statementRequest.setString(2, requestDto.getRequesterId());
 						statementRequest.setString(3, ApprovalConstants.IN_PROGRESS);
-						statementRequest.setLong(4, resultSet.getLong("USERID"));
+						statementRequest.setString(4, requestDto.getRequesterId());
 						statementRequest.setString(5, requestDto.getRemarks());
 						statementRequest.setString(6, requestDto.getReferenceNo());
 						statementRequest.setString(7, requestDto.getFeatureActionId());
 						statementRequest.setString(8, requestDto.getContractId());
-						statementRequest.setInt(9, resultSet.getInt("ISSEQUENTIAL"));
+						statementRequest.setInt(9, requestDto.getIsSequential());
 						statementRequest.setString(10, requestDto.getAccountNo());
+						statementRequest.setInt(11, requestDto.getWorkflowId());
 
 						statementRequest.executeUpdate();
 
@@ -81,53 +88,87 @@ public class CreateNewRequestDao {
 
 					}
 
+					String sqlRoleMember = "SELECT A.CUSTOMER_ID AS APPROVERID FROM customergroup A " +
+							"INNER JOIN membergroup B  ON A.GROUP_ID = B.ID " +
+							"WHERE A.CONTRACTID =? AND A.CORECUSTOMERID =? AND B.NAME =? ";
 
-					String sqlWorkflow = "INSERT INTO ndc_requestworkflow" +
-							"(requestid, approverid, sequenceno, approverorder, approvedate, status, remarks, rulevalue, seqstatus,groupno,groupstatus)" +
-							"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+					int count=0;
+					if(resultSet.getInt("RULEVALUE") == -1){
 
-					PreparedStatement statement1 = connection.prepareStatement(sqlWorkflow);
+						String sqlRoleMember1 = "SELECT count(B.NAME) as count  FROM customergroup A " +
+								"INNER JOIN membergroup B  ON A.GROUP_ID = B.ID " +
+								"WHERE A.CONTRACTID =? AND A.CORECUSTOMERID =? AND B.NAME =? ";
 
-					if (resultSet.getInt("ISSEQUENTIAL") == 1) {
+						PreparedStatement statement2x = connection.prepareStatement(sqlRoleMember1);
+						statement2x.setString(1, requestDto.getContractId());
+						statement2x.setString(2, requestDto.getCoreCustomerId());
+						statement2x.setString(3, resultSet.getString("role"));
 
-						statement1.setLong(1, requestDto.getRequestId());
-						statement1.setString(2, resultSet.getString("APPROVERID"));
-						statement1.setString(3, resultSet.getString("SEQUENCENO"));
-						statement1.setString(4, resultSet.getString("APPROVALORDER"));
-						statement1.setString(5, LocalDateTime.now().toString());
+						ResultSet resultSet1x = statement2x.executeQuery();
+						if(resultSet1x.next()){
 
-						if (resultSet.getInt("GROUPNO") == 1) {
-							statement1.setString(6, ApprovalConstants.PENDING);
-							statement1.setString(9, ApprovalConstants.PENDING);
-							statement1.setString(11, ApprovalConstants.PENDING);
-
-						} else {
-							statement1.setString(6, ApprovalConstants.NOT_ASSIGNED);
-							statement1.setString(9, (resultSet.getInt("SEQUENCENO") == 1 ? ApprovalConstants.PENDING : ApprovalConstants.NOT_ASSIGNED));
-							statement1.setString(11, ApprovalConstants.NOT_ASSIGNED);
+							count = resultSet1x.getInt("count");
 						}
+					}
 
-						statement1.setString(7, requestDto.getRemarks());
-						statement1.setString(8, resultSet.getString("RULEVALUE"));
-						statement1.setString(10, resultSet.getString("GROUPNO"));
+					PreparedStatement statement2 = connection.prepareStatement(sqlRoleMember);
+					statement2.setString(1, requestDto.getContractId());
+					statement2.setString(2, requestDto.getCoreCustomerId());
+					statement2.setString(3, resultSet.getString("role"));
 
-					} else {
+					ResultSet resultSet1 = statement2.executeQuery();
 
-						statement1.setLong(1, requestDto.getRequestId());
-						statement1.setString(2, resultSet.getString("APPROVERID"));
-						statement1.setString(3, resultSet.getString("SEQUENCENO"));
-						statement1.setString(4, resultSet.getString("APPROVALORDER"));
-						statement1.setString(5, LocalDateTime.now().toString());
-						statement1.setString(6, ApprovalConstants.PENDING);
-						statement1.setString(7, requestDto.getRemarks());
-						statement1.setString(8, resultSet.getString("RULEVALUE"));
-						statement1.setString(9, ApprovalConstants.PENDING);
-						statement1.setString(10, resultSet.getString("GROUPNO"));
-						statement1.setString(11, ApprovalConstants.PENDING);
+					while(resultSet1.next()) {
+
+
+						String sqlWorkflow = "INSERT INTO ndc_am_instances" +
+								"(requestid, approverid, sequenceno, approverorder, approvedate, status, remarks, rulevalue, seqstatus,groupno,groupstatus)" +
+								"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+						PreparedStatement statement1 = connection.prepareStatement(sqlWorkflow);
+
+						//if (requestDto.getIsSequential() == 1) {
+
+							statement1.setLong(1, requestDto.getRequestId());
+							statement1.setString(2, resultSet1.getString("APPROVERID"));
+							statement1.setString(3, resultSet.getString("SEQUENCENO"));
+							statement1.setString(4, resultSet.getString("APPROVALORDER"));
+							statement1.setString(5, LocalDateTime.now().toString());
+
+							if (resultSet.getInt("GROUPNO") == 1 && resultSet.getInt("Ischecker") == 1 ) {
+								statement1.setString(6, ApprovalConstants.PENDING);
+								statement1.setString(9, ApprovalConstants.PENDING);
+								statement1.setString(11, ApprovalConstants.PENDING);
+
+							} else {
+								statement1.setString(6, ApprovalConstants.NOT_ASSIGNED);
+								statement1.setString(9, (resultSet.getInt("SEQUENCENO") == 1 ? ApprovalConstants.PENDING : ApprovalConstants.NOT_ASSIGNED));
+								statement1.setString(11, ApprovalConstants.NOT_ASSIGNED);
+							}
+
+							statement1.setString(7, requestDto.getRemarks());
+							statement1.setInt(8, resultSet.getInt("RULEVALUE") == -1 ? count : resultSet.getInt("RULEVALUE") );
+							statement1.setString(10, resultSet.getString("GROUPNO"));
+
+//						} else {
+//
+//							statement1.setLong(1, requestDto.getRequestId());
+//							statement1.setString(2, resultSet.getString("APPROVERID"));
+//							statement1.setString(3, resultSet.getString("SEQUENCENO"));
+//							statement1.setString(4, resultSet.getString("APPROVALORDER"));
+//							statement1.setString(5, LocalDateTime.now().toString());
+//							statement1.setString(6, ApprovalConstants.PENDING);
+//							statement1.setString(7, requestDto.getRemarks());
+//							statement1.setString(8, resultSet.getString("RULEVALUE"));
+//							statement1.setString(9, ApprovalConstants.PENDING);
+//							statement1.setString(10, resultSet.getString("GROUPNO"));
+//							statement1.setString(11, ApprovalConstants.PENDING);
+//
+//						}
+						statement1.executeUpdate();
+						i++;
 
 					}
-					statement1.executeUpdate();
-					i++;
 				}
 				requestDto.setResponse(ApprovalConstants.REQUEST_CREATED_SUCCESSFULLY);
 
@@ -142,6 +183,7 @@ public class CreateNewRequestDao {
 
 			try {
 				connection.rollback();
+				connection.close();
 				requestDto.setResponse(e.getStackTrace().toString());
 			} catch (SQLException ex) {
 				throw new RuntimeException(ex);

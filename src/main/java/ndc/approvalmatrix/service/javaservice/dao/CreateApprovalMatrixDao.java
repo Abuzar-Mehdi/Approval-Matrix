@@ -3,6 +3,7 @@ package ndc.approvalmatrix.service.javaservice.dao;
 import ndc.approvalmatrix.service.javaservice.commons.ApprovalConstants;
 import ndc.approvalmatrix.service.javaservice.dto.ApprovalRequestDto;
 import ndc.approvalmatrix.service.javaservice.dto.ApprovalRow;
+import ndc.approvalmatrix.service.javaservice.dto.WorkFlowFeatureAction;
 
 import java.sql.*;
 
@@ -25,15 +26,14 @@ public class CreateApprovalMatrixDao {
         String result;
         try {
 
-            String sqlMaster ="INSERT INTO ndc_approvalmatrixmaster (CONTRACTID, ACCOUNTNO,USERID, ISSEQUENTIAL)" +
-                    "VALUES(?, ?, ?, ?)";
+            String sqlMaster ="INSERT INTO ndc_am_matrix (CONTRACTID, ACCOUNTNO,USERID )"+  //, ISSEQUENTIAL)" +
+                    "VALUES(?, ?, ?)";
 
             PreparedStatement statement = connection.prepareStatement(sqlMaster, Statement.RETURN_GENERATED_KEYS);
 
             statement.setString(1,approvalRequestDto.getContractId()); //ContractID
             statement.setString(2,approvalRequestDto.getAccountNo()); //ContractID
             statement.setString(3,approvalRequestDto.getUserId()); //userid
-            statement.setInt(4,approvalRequestDto.getIsSequential()); //Sequential 1, Non-sequential 0
 
             statement.executeUpdate();
 
@@ -48,88 +48,82 @@ public class CreateApprovalMatrixDao {
 
             for(ApprovalRow approvalRow : approvalRequestDto.getApprovalRowList()) {
 
-                String sqlRoleMember = "SELECT A.CUSTOMER_ID AS APPROVERID FROM customergroup A " +
-                        "INNER JOIN membergroup B  ON A.GROUP_ID = B.ID " +
-                        "WHERE A.CONTRACTID =? AND A.CORECUSTOMERID =? AND B.NAME =? ";
+//                String sqlRoleMember = "SELECT A.CUSTOMER_ID AS APPROVERID FROM customergroup A " +
+//                        "INNER JOIN membergroup B  ON A.GROUP_ID = B.ID " +
+//                        "WHERE A.CONTRACTID =? AND A.CORECUSTOMERID =? AND B.NAME =? ";
+//
+//                PreparedStatement statement1 = connection.prepareStatement(sqlRoleMember);
+//                statement1.setString(1, approvalRequestDto.getContractId());
+//                statement1.setString(2, approvalRequestDto.getCoreCustomerId());
+//                statement1.setString(3, approvalRow.getRole());
+//
+//                ResultSet resultSet = statement1.executeQuery();
 
-                PreparedStatement statement1 = connection.prepareStatement(sqlRoleMember);
-                statement1.setString(1, approvalRequestDto.getContractId());
-                statement1.setString(2, approvalRequestDto.getCoreCustomerId());
-                statement1.setString(3, approvalRow.getRole());
-
-                ResultSet resultSet = statement1.executeQuery();
                 int i = 0;
                 String rule = null;
 
-                while (resultSet.next()) {
 
-                    i++;
+                String sqlDetail = "INSERT INTO ndc_am_matrix_detail" +
+                        "(matrixid, workflowid, sequenceno, groupno, role, ischecker, rulevalue, rule,approvalorder)" +
+                        "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-                    String sqlDetail = "INSERT INTO ndc_approvalmatrixdetail (APPROVALMASTERID, APPROVERID, SEQUENCENO, GROUPNO,APPROVALORDER, ROLE) " +
-                            "VALUES(?, ?, ?, ?, ?, ?)";
 
-                    PreparedStatement statement2 = connection.prepareStatement(sqlDetail);
-                    statement2.setLong(1, approvalRequestDto.getRequestId());
-                    statement2.setString(2, resultSet.getString("approverid"));
-                    statement2.setInt(3, approvalRow.getSequenceNo());
-                    statement2.setInt(4, approvalRow.getGroupNo() == null ? 1 :approvalRow.getGroupNo() );
-                    statement2.setInt(5, approvalRow.getSequenceNo());
-                    statement2.setString(6, approvalRow.getRole());
 
-                    statement2.executeUpdate();
+                PreparedStatement statement2 = connection.prepareStatement(sqlDetail);
 
-                }
-
-                //Insertion into Sequence Rule
-
-                String sqlRule = "INSERT INTO ndc_sequencerule" +
-                        "(APPROVALMASTERID, SEQUENCENO, GROUPNO ,RULE, RULEVALUE)" +
-                        "VALUES(?, ?, ?, ?, ?)";
-
-                PreparedStatement statement3 = connection.prepareStatement(sqlRule);
-                statement3.setLong(1, approvalRequestDto.getRequestId());
-                statement3.setInt(2,  approvalRow.getSequenceNo());
-                statement3.setInt(3, approvalRow.getGroupNo() == null ? 1 :approvalRow.getGroupNo() );
-
+                statement2.setLong(1, approvalRequestDto.getRequestId());
+                statement2.setInt(2, approvalRow.getWorkflowId());
+                statement2.setInt(3, approvalRow.getSequenceNo());
+                statement2.setInt(4, approvalRow.getGroupNo() == null ? 1 : approvalRow.getGroupNo());
+                statement2.setString(5, approvalRow.getRole());
+                statement2.setInt(6, approvalRow.getIsChecker());
 
                 if (ApprovalConstants.ANY_ONE_VALUE == approvalRow.getApprovalRule()) {
 
-                    if (i > 1) {
-                        i = 1;
-                    }
-                    rule=ApprovalConstants.ANY_ONE;
+                    rule = ApprovalConstants.ANY_ONE;
 
-                } else if (ApprovalConstants.ANY_TWO_VALUE == approvalRow.getApprovalRule() ) {
+                } else if (ApprovalConstants.ANY_TWO_VALUE == approvalRow.getApprovalRule()) {
 
-                    if (i > 2) {
-                        i = 2;
-                    }
-                    rule=ApprovalConstants.ANY_TWO;
+                    rule = ApprovalConstants.ANY_TWO;
 
                 } else if (ApprovalConstants.ANY_THREE_VALUE == approvalRow.getApprovalRule()) {
 
-                    if (i > 3) {
-                        i = 3;
-                    }
-                    rule=ApprovalConstants.ANY_THREE;
+                    rule = ApprovalConstants.ANY_THREE;
 
-                }   else if (ApprovalConstants.ANY_FOUR_VALUE == approvalRow.getApprovalRule()) {
+                } else if (ApprovalConstants.ANY_FOUR_VALUE == approvalRow.getApprovalRule()) {
 
-                if (i > 4) {
-                    i = 4;
+                    rule = ApprovalConstants.ANY_FOUR;
+
+                } else if (ApprovalConstants.ALL_VALUE == approvalRow.getApprovalRule()) {
+
+                    rule = ApprovalConstants.ALL;
+
                 }
-                rule=ApprovalConstants.ANY_FOUR;
+
+                statement2.setInt(7, approvalRow.getApprovalRule());
+                statement2.setString(8, rule);
+                statement2.setInt(9, approvalRow.getGroupNo() == null ? 1 : approvalRow.getGroupNo());
+
+                statement2.executeUpdate();
 
             }
-                else if (ApprovalConstants.ALL_VALUE == approvalRow.getApprovalRule()) {
 
-                    rule=ApprovalConstants.ALL;
-                }
+            for ( WorkFlowFeatureAction workFlowFeatureAction : approvalRequestDto.getWorkFlowFeatureActions() ) {
 
-                statement3.setString(4, rule); // ALL ,ANY_ONE,ANY_TWO,ANY_THREE,ANY_FOUR
-                statement3.setInt(5, i);
+                String sql="INSERT INTO ndc_am_workflow " +
+                        "(matrixid, workflowid, issequential, featureactionid, minamount, maxamount) " +
+                        "VALUES(?, ?, ?, ?, ?, ?) ";
 
-                statement3.executeUpdate();
+                PreparedStatement statement1 = connection.prepareStatement(sql);
+                statement1.setLong(1, approvalRequestDto.getRequestId());
+                statement1.setInt(2, workFlowFeatureAction.getWorkflowId());
+                statement1.setInt(3, workFlowFeatureAction.getIsSequential());
+                statement1.setString(4, workFlowFeatureAction.getFeatureActionId());
+                statement1.setDouble(5, workFlowFeatureAction.getMinAmount());
+                statement1.setDouble(6, workFlowFeatureAction.getMaxAmount());
+
+                statement1.executeUpdate();
+
             }
 
             result="Approval Matrix Successfully created :"+approvalRequestDto.getRequestId();
@@ -139,6 +133,7 @@ public class CreateApprovalMatrixDao {
             try {
                 result ="Error in creating Approval Matrix :"+exception.getMessage();
                 connection.rollback();
+                connection.close();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }

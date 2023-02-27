@@ -102,6 +102,7 @@ public class RejectRequestDao {
         } catch (SQLException e) {
             try {
                 connection.rollback();
+                connection.close();
                 requestDto.setResponse(e.getStackTrace().toString());
                 e.printStackTrace();
             } catch (SQLException ex) {

@@ -11,9 +11,10 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ApprovalRow {
 
+    private Integer workflowId;
     private Integer sequenceNo;
     private Integer groupNo;
     private Integer approvalRule;
     private String role;
-
+    private Integer isChecker;
 }

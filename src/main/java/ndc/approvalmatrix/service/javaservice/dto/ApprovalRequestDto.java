@@ -21,5 +21,6 @@ public class ApprovalRequestDto {
     private Integer isSequential;
     private String coreCustomerId;
     private List<ApprovalRow> approvalRowList;
+    private List<WorkFlowFeatureAction> workFlowFeatureActions;
 
 }

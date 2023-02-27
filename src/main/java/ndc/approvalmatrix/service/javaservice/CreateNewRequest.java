@@ -80,10 +80,11 @@ public class CreateNewRequest  implements JavaService2 {
 				.requesterId("6284824056")
 				.contractId("8436131351")
 				.accountNo("1234545667")
-				.referenceNo("e8e2c8d6-97ea-11ed-a8fc-0242ac120004")
+				.referenceNo("e8e2c8d6-97ea-11ed-a8fc-0242ac120011")
 				.remarks("request created by 6284824056")
 				.featureActionId("BILL_PAY_CREATE")
-				.amount(9999999d)
+				.amount(5000d)
+				.coreCustomerId("102190")
 				.build();
 
 		Connection connection = new DatabaseConnection().getDatabaseConnection();

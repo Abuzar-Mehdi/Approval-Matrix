@@ -92,6 +92,7 @@ public class CancelRequestDao {
 
             try {
                 connection.rollback();
+                connection.close();
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }

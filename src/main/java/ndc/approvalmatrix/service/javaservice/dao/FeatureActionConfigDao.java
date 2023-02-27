@@ -5,6 +5,7 @@ import ndc.approvalmatrix.service.javaservice.dto.FeatureActionConfigDto;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -99,8 +100,15 @@ public class FeatureActionConfigDao {
             preparedStatement.executeBatch();
 
         }catch (Exception e){
-            message = "ERROR IN RECORD INSERTION / UPDATION  "+e.getMessage();
-            e.printStackTrace();
+            try {
+                connection.rollback();
+                connection.close();
+                message = "ERROR IN RECORD INSERTION / UPDATION  "+e.getMessage();
+                e.printStackTrace();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+
         }
 
         return message;

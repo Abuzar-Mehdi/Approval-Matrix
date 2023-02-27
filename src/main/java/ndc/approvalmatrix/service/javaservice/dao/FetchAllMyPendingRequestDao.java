@@ -65,6 +65,7 @@ public class FetchAllMyPendingRequestDao {
             try {
                 exception.printStackTrace();
                 connection.rollback();
+                connection.close();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }

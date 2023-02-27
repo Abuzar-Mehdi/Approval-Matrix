@@ -28,4 +28,7 @@ public class RequestDto {
 	private String assignDate;
 	private String accountNo;
 	private Double amount;
+	private int workflowId;
+	private int isSequential;
+	private String coreCustomerId;
 }

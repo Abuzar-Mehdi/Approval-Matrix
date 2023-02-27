@@ -26,8 +26,8 @@ public class ApproveRequestDao {
         try {
 
 
-            String sqlRequest="SELECT NR.ID,NR.CONTRACTID ,NR2.SEQUENCENO,NR2.GROUPNO,NR2.ID AS REQID,NR2.RULEVALUE,NR.ISSEQUENTIAL,NR.STATUS ,NR2.SEQSTATUS,NR2.STATUS as APPROVERSTATUS ,NR2.GROUPSTATUS FROM ndc_request NR  " +
-                    "INNER JOIN ndc_requestworkflow NR2 ON NR.ID =NR2.REQUESTID " +
+            String sqlRequest="SELECT NR.ID,NR.CONTRACTID ,NR2.SEQUENCENO,NR2.GROUPNO,NR2.ID AS REQID,NR2.RULEVALUE,NR.ISSEQUENTIAL,NR.STATUS ,NR2.SEQSTATUS,NR2.STATUS as APPROVERSTATUS ,NR2.GROUPSTATUS FROM ndc_am_request NR  " +
+                    "INNER JOIN ndc_am_instances NR2 ON NR.ID =NR2.REQUESTID " +
                     "WHERE NR.CONTRACTID =? AND  NR.ACCOUNTNO=? AND NR2.APPROVERID =? AND NR.REFERENCENO =? " ;
                    // "AND NR.STATUS =? AND NR2.SEQSTATUS =? AND NR2.STATUS=? ";
 
@@ -54,7 +54,7 @@ public class ApproveRequestDao {
                     /// UPDATING REQUEST WORK FLOW STATUS ///
 
                     //String sqlWorkFlow = "UPDATE ndc_requestworkflow SET  status=?, remarks=? WHERE requestid=? and approverid=? and sequenceno=?";
-                    String sqlWorkFlow = "UPDATE ndc_requestworkflow SET  STATUS=?, REMARKS=? WHERE ID=? ";
+                    String sqlWorkFlow = "UPDATE ndc_am_instances SET  STATUS=?, REMARKS=? WHERE ID=? ";
 
                     PreparedStatement statementU = connection.prepareStatement(sqlWorkFlow);
 
@@ -67,14 +67,7 @@ public class ApproveRequestDao {
                         throw new RuntimeException("Record not updated");
                     }
 
-                  /*  String sqlWork = "SELECT REQUESTID ,SEQUENCENO ,COUNT(STATUS),RULEVALUE  FROM ndc_requestworkflow GROUP BY STATUS,SEQUENCENO,REQUESTID  " +
-                            "HAVING REQUESTID =? AND STATUS =? AND SEQUENCENO =? AND COUNT(STATUS)=? ";
-                     PreparedStatement statement1 = connection.prepareStatement(sqlWork);
-                    statement1.setLong(1, requestDto.getRequestId());
-                    statement1.setString(2, ApprovalConstants.APPROVED);
-                    statement1.setInt(3, requestDto.getSequenceNo());
-                    statement1.setInt(4, requestDto.getRuleValue());
-                    ResultSet resultSet2 = statement1.executeQuery();*/
+
 
                     CallableStatement callableStatement = connection.prepareCall("{CALL "+ ApprovalConstants.GET_GROUP_STATUS +"(?,?,?,?,?,?)}");
                     callableStatement.setLong(1, requestDto.getRequestId());
@@ -97,7 +90,7 @@ public class ApproveRequestDao {
 
                             // Updating group Status //
 
-                            String sqlAssignToNextApprove = "UPDATE ndc_requestworkflow SET  GROUPSTATUS=? WHERE REQUESTID=? AND SEQUENCENO=? AND  GROUPNO=?  ";
+                            String sqlAssignToNextApprove = "UPDATE ndc_am_instances SET  GROUPSTATUS=? WHERE REQUESTID=? AND SEQUENCENO=? AND  GROUPNO=?  ";
                             PreparedStatement statement = connection.prepareStatement(sqlAssignToNextApprove);
                             statement.setString(1, ApprovalConstants.APPROVED);
                             statement.setLong(2, requestDto.getRequestId());
@@ -119,7 +112,7 @@ public class ApproveRequestDao {
                             if (resultSet3.next()) {
 
 
-                                String sqlAssignToNextApprove1 = "UPDATE ndc_requestworkflow SET  SEQSTATUS=? WHERE REQUESTID=? AND SEQUENCENO=? ";
+                                String sqlAssignToNextApprove1 = "UPDATE ndc_am_instances SET  SEQSTATUS=? WHERE REQUESTID=? AND SEQUENCENO=? ";
                                 PreparedStatement statement2 = connection.prepareStatement(sqlAssignToNextApprove1);
                                 statement2.setString(1, ApprovalConstants.APPROVED);
                                 statement2.setLong(2, requestDto.getRequestId());
@@ -127,7 +120,7 @@ public class ApproveRequestDao {
 
                                 statement2.executeUpdate();
 
-                                String sqlAssignToNextApprover2 = "UPDATE ndc_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?   WHERE ID=?";
+                                String sqlAssignToNextApprover2 = "UPDATE ndc_am_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?   WHERE ID=?";
                                 PreparedStatement statement3 = connection.prepareStatement(sqlAssignToNextApprover2);
                                 statement3.setString(1, ApprovalConstants.APPROVED);
                                 statement3.setString(2, requestDto.getRemarks());
@@ -144,7 +137,7 @@ public class ApproveRequestDao {
                             else {
 
                                 int nextGroup = requestDto.getGroupNo();
-                                String sqlAssignToNextApprove1 = "UPDATE ndc_requestworkflow SET  STATUS=? , GROUPSTATUS=? ,SEQSTATUS=?  WHERE REQUESTID=? AND SEQUENCENO=? AND GROUPNO=? ";
+                                String sqlAssignToNextApprove1 = "UPDATE ndc_am_instances SET  STATUS=? , GROUPSTATUS=? ,SEQSTATUS=?  WHERE REQUESTID=? AND SEQUENCENO=? AND GROUPNO=? ";
                                 PreparedStatement statement2 = connection.prepareStatement(sqlAssignToNextApprove1);
                                 statement2.setString(1, ApprovalConstants.PENDING);
                                 statement2.setString(2, ApprovalConstants.PENDING);
@@ -155,7 +148,7 @@ public class ApproveRequestDao {
 
                             if (statement2.executeUpdate() >= 1) {
 
-                                String sqlAssignToNextApprover2 = "UPDATE ndc_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?  WHERE ID=?";
+                                String sqlAssignToNextApprover2 = "UPDATE ndc_am_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?  WHERE ID=?";
                                 PreparedStatement statement3 = connection.prepareStatement(sqlAssignToNextApprover2);
                                 statement3.setString(1, ApprovalConstants.IN_PROGRESS);
                                 statement3.setString(2, requestDto.getRemarks());
@@ -170,7 +163,7 @@ public class ApproveRequestDao {
 
                             } else {
 
-                                String sqlAssignToNextApprover2 = "UPDATE ndc_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?   WHERE ID=?";
+                                String sqlAssignToNextApprover2 = "UPDATE ndc_am_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?   WHERE ID=?";
                                 PreparedStatement statement3 = connection.prepareStatement(sqlAssignToNextApprover2);
                                 statement3.setString(1, ApprovalConstants.APPROVED);
                                 statement3.setString(2, requestDto.getRemarks());
@@ -186,7 +179,7 @@ public class ApproveRequestDao {
                             }
 
 
-                                String sqlAssignToNextApprover2 = "UPDATE ndc_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?  WHERE ID=?";
+                                String sqlAssignToNextApprover2 = "UPDATE ndc_am_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?  WHERE ID=?";
                                 PreparedStatement statement3 = connection.prepareStatement(sqlAssignToNextApprover2);
                                 statement3.setString(1, ApprovalConstants.IN_PROGRESS);
                                 statement3.setString(2, requestDto.getRemarks());
@@ -206,7 +199,7 @@ public class ApproveRequestDao {
 
                             // Updating group Status //
 
-                            String sqlAssignToNextApprove = "UPDATE ndc_requestworkflow SET  GROUPSTATUS=? WHERE REQUESTID=? AND SEQUENCENO=? AND  GROUPNO=?  ";
+                            String sqlAssignToNextApprove = "UPDATE ndc_am_instances SET  GROUPSTATUS=? WHERE REQUESTID=? AND SEQUENCENO=? AND  GROUPNO=?  ";
                             PreparedStatement statement = connection.prepareStatement(sqlAssignToNextApprove);
                             statement.setString(1, ApprovalConstants.APPROVED);
                             statement.setLong(2, requestDto.getRequestId());
@@ -228,7 +221,7 @@ public class ApproveRequestDao {
                             if (resultSet3.next()) {
 
 
-                                String sqlAssignToNextApprove1 = "UPDATE ndc_requestworkflow SET  SEQSTATUS=? WHERE REQUESTID=? AND SEQUENCENO=? ";
+                                String sqlAssignToNextApprove1 = "UPDATE ndc_am_instances SET  SEQSTATUS=? WHERE REQUESTID=? AND SEQUENCENO=? ";
                                 PreparedStatement statement2 = connection.prepareStatement(sqlAssignToNextApprove1);
                                 statement2.setString(1, ApprovalConstants.APPROVED);
                                 statement2.setLong(2, requestDto.getRequestId());
@@ -236,7 +229,7 @@ public class ApproveRequestDao {
 
                                 statement2.executeUpdate();
 
-                                String sqlAssignToNextApprover2 = "UPDATE ndc_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?   WHERE ID=?";
+                                String sqlAssignToNextApprover2 = "UPDATE ndc_am_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?   WHERE ID=?";
                                 PreparedStatement statement3 = connection.prepareStatement(sqlAssignToNextApprover2);
                                 statement3.setString(1, ApprovalConstants.APPROVED);
                                 statement3.setString(2, requestDto.getRemarks());
@@ -252,7 +245,18 @@ public class ApproveRequestDao {
                             }
                             else {
 
-                                String sqlAssignToNextApprover2 = "UPDATE ndc_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?  WHERE ID=?";
+                                String sqlAssignToNextApprove1 = "UPDATE ndc_am_instances SET  STATUS=?, GROUPSTATUS=?  WHERE REQUESTID=? AND SEQUENCENO=? AND STATUS=? AND GROUPSTATUS=? ";
+                                PreparedStatement statement2 = connection.prepareStatement(sqlAssignToNextApprove1);
+                                statement2.setString(1, ApprovalConstants.PENDING);
+                                statement2.setString(2, ApprovalConstants.PENDING);
+                                statement2.setLong(3, requestDto.getRequestId());
+                                statement2.setInt(4, requestDto.getSequenceNo());
+                                statement2.setString(5, ApprovalConstants.NOT_ASSIGNED);
+                                statement2.setString(6, ApprovalConstants.NOT_ASSIGNED);
+
+                                statement2.executeUpdate();
+
+                                String sqlAssignToNextApprover2 = "UPDATE ndc_am_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?  WHERE ID=?";
                                 PreparedStatement statement3 = connection.prepareStatement(sqlAssignToNextApprover2);
                                 statement3.setString(1, ApprovalConstants.IN_PROGRESS);
                                 statement3.setString(2, requestDto.getRemarks());
@@ -270,7 +274,7 @@ public class ApproveRequestDao {
 
                     } else {
 
-                        String sqlAssignToNextApprover2 = "UPDATE ndc_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?  WHERE ID=?";
+                        String sqlAssignToNextApprover2 = "UPDATE ndc_am_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?  WHERE ID=?";
                         PreparedStatement statement3 = connection.prepareStatement(sqlAssignToNextApprover2);
                         statement3.setString(1, ApprovalConstants.IN_PROGRESS);
                         statement3.setString(2, requestDto.getRemarks());
@@ -326,6 +330,7 @@ public class ApproveRequestDao {
         } catch (SQLException e) {
             try {
                 connection.rollback();
+                connection.close();
                 requestDto.setResponse(e.getMessage());
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
