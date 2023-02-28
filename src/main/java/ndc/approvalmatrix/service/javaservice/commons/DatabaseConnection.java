@@ -20,4 +20,19 @@ public class DatabaseConnection {
         return  connection;
 
     }
+
+	public Connection getDatabaseConnection(String hostUrl,String dbxPort,String dbxSchemaName,String dbxDbUsername,String dbxDbPassword)  {
+
+		String DB_URL = "jdbc:mysql://"+hostUrl+":"+dbxPort+"/"+dbxSchemaName;
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(DB_URL, dbxDbUsername, dbxDbPassword);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return  connection;
+
+	}
 }

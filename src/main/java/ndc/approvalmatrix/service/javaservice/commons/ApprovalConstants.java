@@ -71,4 +71,5 @@ public class ApprovalConstants {
 
     public static final String GET_FEATUREACTION_APPROVER_LIMIT ="ndc_getapproverfeatureactionlimiagainstcontractaccount";
 
+    public static final String REMOVE_TO_HISTORY ="ndc_transfermatrixtohistory";
 }

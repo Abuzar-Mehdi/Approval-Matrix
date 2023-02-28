@@ -6,6 +6,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import com.google.gson.Gson;
+import com.konylabs.middleware.api.ConfigurableParametersHelper;
+import com.konylabs.middleware.api.ServicesManager;
 import com.konylabs.middleware.common.JavaService2;
 import com.konylabs.middleware.controller.DataControllerRequest;
 import com.konylabs.middleware.controller.DataControllerResponse;
@@ -26,8 +28,18 @@ public class CreateNewRequest  implements JavaService2 {
 
 		try {
 
+			ServicesManager sm = request.getServicesManager();
+			ConfigurableParametersHelper paramHelper = sm.getConfigurableParametersHelper();
 
-			connection = new DatabaseConnection().getDatabaseConnection();
+			String hostURL = paramHelper.getServerProperty("DBX_HOST_URL").split("//")[1];
+			String dbxPort = paramHelper.getServerProperty("DBX_PORT");
+			String dbxSchemaName = paramHelper.getServerProperty("DBX_SCHEMA_NAME");
+			String dbxDbUsername = paramHelper.getServerProperty("DBX_DB_USERNAME");
+			String dbxDbPassword = paramHelper.getServerProperty("DBX_DB_PASSWORD");
+
+
+			connection = new DatabaseConnection().getDatabaseConnection(hostURL.split(":")[0],dbxPort,dbxSchemaName,dbxDbUsername,dbxDbPassword);
+
 			connection.setAutoCommit(false);
 
 			RequestDto requestDto = RequestDto.builder()
@@ -38,6 +50,7 @@ public class CreateNewRequest  implements JavaService2 {
 					.featureActionId(request.getParameter("featureActionId"))
 					.accountNo(request.getParameter("accountNo"))
 					.amount(Double.valueOf(request.getParameter("amount")))
+					.coreCustomerId(request.getParameter("coreCustomerId"))
 					.build();
 
 
@@ -55,6 +68,7 @@ public class CreateNewRequest  implements JavaService2 {
 
 			try {
 				connection.rollback();
+				connection.rollback();
 			} catch (SQLException ex) {
 				throw new RuntimeException(ex);
 			}
@@ -66,31 +80,31 @@ public class CreateNewRequest  implements JavaService2 {
 //	public static void main(String[] args) throws SQLException {
 //
 //		String json = "{\n" +
-//				"  \"requesterId\": \"6284824056\",\n" +
+//				"  \"requesterId\": \"1234567\",\n" +
 //				"  \"contractId\": \"8436131351\",\n" +
-//				"  \"referenceNo\": \"e8e2c8d6-97ea-11ed-a8fc-0242ac120005\",\n" +
+//				"  \"referenceNo\": \"e8e2c8d6-97ea-11ed-a8fc-0242ac120013\",\n" +
 //				"  \"featureActionId\": \"BILL_PAY_CREATE\",\n" +
+//				"  \"accountNo\": \"1234545667\",\n" +
 //				"  \"remarks\": \"Transaction created\",\n" +
-//				"  \"accountNo\": \"1234545667\"\n" +
+//				"  \"amount\": \"5000\"\n" +
 //				"}";
 //
-//		//RequestDto requestDto = new Gson().fromJson(json,RequestDto.class);
+//		RequestDto requestDto = new Gson().fromJson(json,RequestDto.class);
 //
-//		RequestDto requestDto = RequestDto.builder()
-//				.requesterId("6284824056")
-//				.contractId("8436131351")
-//				.accountNo("1234545667")
-//				.referenceNo("e8e2c8d6-97ea-11ed-a8fc-0242ac120011")
-//				.remarks("request created by 6284824056")
-//				.featureActionId("BILL_PAY_CREATE")
-//				.amount(5000d)
-//				.coreCustomerId("102190")
-//				.build();
+////		RequestDto requestDto = RequestDto.builder()
+////				.requesterId("6284824056")
+////				.contractId("8436131351")
+////				.accountNo("1234545667")
+////				.referenceNo("e8e2c8d6-97ea-11ed-a8fc-0242ac120011")
+////				.remarks("request created by 6284824056")
+////				.featureActionId("BILL_PAY_CREATE")
+////				.amount(5000d)
+////				.coreCustomerId("102190")
+////				.build();
 //
 //		Connection connection = new DatabaseConnection().getDatabaseConnection();
 //		connection.setAutoCommit(false);
 //
-//		//RequestDto requestDto = new Gson().fromJson(request.getParameter("data"), RequestDto.class);
 //
 //		CreateNewRequestDao createNewRequestDao = new CreateNewRequestDao(connection);
 //

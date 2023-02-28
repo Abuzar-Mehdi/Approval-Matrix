@@ -1,6 +1,8 @@
 package ndc.approvalmatrix.service.javaservice;
 
 import com.google.gson.Gson;
+import com.konylabs.middleware.api.ConfigurableParametersHelper;
+import com.konylabs.middleware.api.ServicesManager;
 import com.konylabs.middleware.common.JavaService2;
 import com.konylabs.middleware.controller.DataControllerRequest;
 import com.konylabs.middleware.controller.DataControllerResponse;
@@ -145,14 +147,24 @@ public class CreateApprovalMatrix implements JavaService2 {
 
     static String json3 = "{\"requestId\":\"0\",\"userId\":\"4646038518\",\"contractId\":\"8436131351\",\"isSequential\":\"1\",\"coreCustomerId\":\"102190\",\"approvalRowList\":[{\"workflowId\":1,\"sequenceNo\":1,\"groupNo\":1,\"approvalRule\":2,\"role\":\"Approver\",\"isChecker\":1},{\"workflowId\":1,\"sequenceNo\":1,\"groupNo\":2,\"approvalRule\":3,\"role\":\"Authorizer\",\"isChecker\":0},{\"workflowId\":1,\"sequenceNo\":2,\"groupNo\":1,\"approvalRule\":-1,\"role\":\"Administrator\",\"isChecker\":1},{\"workflowId\":2,\"sequenceNo\":1,\"groupNo\":1,\"approvalRule\":2,\"role\":\"Approver\",\"isChecker\":1},{\"workflowId\":2,\"sequenceNo\":1,\"groupNo\":2,\"approvalRule\":3,\"role\":\"Authorizer\",\"isChecker\":0}],\"accountNo\":\"1234545667\",\"workFlowFeatureActions\":[{\"workflowId\":1,\"isSequential\":0,\"featureActionId\":\"BILL_PAY_CREATE\",\"minAmount\":1,\"maxAmount\":50000},{\"workflowId\":2,\"isSequential\":1,\"featureActionId\":\"BILL_PAY_CREATE\",\"minAmount\":50001,\"maxAmount\":100000}]}";
     @Override
-    public Object invoke(String s, Object[] objects, DataControllerRequest dataControllerRequest, DataControllerResponse dataControllerResponse) throws SQLException {
+    public Object invoke(String s, Object[] objects, DataControllerRequest dataControllerRequest, DataControllerResponse dataControllerResponse)  {
 
         Result result = new Result();
         Connection connection = null;
 
         try {
 
-             connection = new DatabaseConnection().getDatabaseConnection();
+            ServicesManager sm = dataControllerRequest.getServicesManager();
+            ConfigurableParametersHelper paramHelper = sm.getConfigurableParametersHelper();
+
+            String hostURL = paramHelper.getServerProperty("DBX_HOST_URL").split("//")[1];
+            String dbxPort = paramHelper.getServerProperty("DBX_PORT");
+            String dbxSchemaName = paramHelper.getServerProperty("DBX_SCHEMA_NAME");
+            String dbxDbUsername = paramHelper.getServerProperty("DBX_DB_USERNAME");
+            String dbxDbPassword = paramHelper.getServerProperty("DBX_DB_PASSWORD");
+
+            connection = new DatabaseConnection().getDatabaseConnection(hostURL.split(":")[0],dbxPort,dbxSchemaName,dbxDbUsername,dbxDbPassword);
+
             connection.setAutoCommit(false);
 
             ApprovalRequestDto approvalRequestDto = new Gson().fromJson(dataControllerRequest.getParameter("approvalRowList"), ApprovalRequestDto.class);
@@ -161,9 +173,9 @@ public class CreateApprovalMatrix implements JavaService2 {
             approvalRequestDto.setWorkFlowFeatureActions(approvalRequestDto1.getWorkFlowFeatureActions());
             approvalRequestDto.setUserId(dataControllerRequest.getParameter("userId"));
             approvalRequestDto.setContractId(dataControllerRequest.getParameter("contractId"));
-            approvalRequestDto.setIsSequential(Integer.valueOf(dataControllerRequest.getParameter("isSequential")));
-            approvalRequestDto.setCoreCustomerId(dataControllerRequest.getParameter("coreCustomerId"));
             approvalRequestDto.setAccountNo(dataControllerRequest.getParameter("accountNo"));
+            approvalRequestDto.setIsEdit(Integer.valueOf(dataControllerRequest.getParameter("isEdit")));
+            approvalRequestDto.setWorkFlowId(Integer.valueOf(dataControllerRequest.getParameter("workFlowId")));
 
             CreateApprovalMatrixDao approvalMatrixDao = new CreateApprovalMatrixDao(connection);
             result.addParam("data", approvalMatrixDao.createApprovalMatrix(approvalRequestDto));
@@ -172,11 +184,14 @@ public class CreateApprovalMatrix implements JavaService2 {
             connection.close();
 
         }catch (Exception e){
-            connection.rollback();
-            e.printStackTrace();
+            try {
+                e.printStackTrace();
+                connection.rollback();
+                connection.close();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
         }
-
-
         return result;
     }
 

@@ -18,9 +18,9 @@ public class ApprovalRequestDto {
     private String userId;
     private String contractId;
     private String accountNo;
-    private Integer isSequential;
-    private String coreCustomerId;
+    private Integer workFlowId;
     private List<ApprovalRow> approvalRowList;
     private List<WorkFlowFeatureAction> workFlowFeatureActions;
-
+    private Long matrixId;
+    private Integer isEdit;
 }

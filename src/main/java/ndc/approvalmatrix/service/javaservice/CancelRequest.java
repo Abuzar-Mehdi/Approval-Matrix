@@ -1,6 +1,8 @@
 package ndc.approvalmatrix.service.javaservice;
 
 import com.google.gson.Gson;
+import com.konylabs.middleware.api.ConfigurableParametersHelper;
+import com.konylabs.middleware.api.ServicesManager;
 import com.konylabs.middleware.common.JavaService2;
 import com.konylabs.middleware.controller.DataControllerRequest;
 import com.konylabs.middleware.controller.DataControllerResponse;
@@ -22,7 +24,17 @@ public class CancelRequest implements JavaService2 {
 
         try {
 
-            connection = new DatabaseConnection().getDatabaseConnection();
+            ServicesManager sm = request.getServicesManager();
+            ConfigurableParametersHelper paramHelper = sm.getConfigurableParametersHelper();
+
+            String hostURL = paramHelper.getServerProperty("DBX_HOST_URL").split("//")[1];
+            String dbxPort = paramHelper.getServerProperty("DBX_PORT");
+            String dbxSchemaName = paramHelper.getServerProperty("DBX_SCHEMA_NAME");
+            String dbxDbUsername = paramHelper.getServerProperty("DBX_DB_USERNAME");
+            String dbxDbPassword = paramHelper.getServerProperty("DBX_DB_PASSWORD");
+
+            connection = new DatabaseConnection().getDatabaseConnection(hostURL.split(":")[0],dbxPort,dbxSchemaName,dbxDbUsername,dbxDbPassword);
+
             connection.setAutoCommit(false);
 
 
@@ -48,6 +60,7 @@ public class CancelRequest implements JavaService2 {
 
             try {
                 connection.rollback();
+                connection.close();
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }

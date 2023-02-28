@@ -87,6 +87,7 @@ public class CreateNewRequestDao {
 						requestDto.setRequestId(keys.getLong(1));
 
 					}
+					i++;
 
 					String sqlRoleMember = "SELECT A.CUSTOMER_ID AS APPROVERID FROM customergroup A " +
 							"INNER JOIN membergroup B  ON A.GROUP_ID = B.ID " +
@@ -150,25 +151,12 @@ public class CreateNewRequestDao {
 							statement1.setInt(8, resultSet.getInt("RULEVALUE") == -1 ? count : resultSet.getInt("RULEVALUE") );
 							statement1.setString(10, resultSet.getString("GROUPNO"));
 
-//						} else {
-//
-//							statement1.setLong(1, requestDto.getRequestId());
-//							statement1.setString(2, resultSet.getString("APPROVERID"));
-//							statement1.setString(3, resultSet.getString("SEQUENCENO"));
-//							statement1.setString(4, resultSet.getString("APPROVALORDER"));
-//							statement1.setString(5, LocalDateTime.now().toString());
-//							statement1.setString(6, ApprovalConstants.PENDING);
-//							statement1.setString(7, requestDto.getRemarks());
-//							statement1.setString(8, resultSet.getString("RULEVALUE"));
-//							statement1.setString(9, ApprovalConstants.PENDING);
-//							statement1.setString(10, resultSet.getString("GROUPNO"));
-//							statement1.setString(11, ApprovalConstants.PENDING);
-//
-//						}
+
 						statement1.executeUpdate();
-						i++;
 
 					}
+
+				//	i++;
 				}
 				requestDto.setResponse(ApprovalConstants.REQUEST_CREATED_SUCCESSFULLY);
 
