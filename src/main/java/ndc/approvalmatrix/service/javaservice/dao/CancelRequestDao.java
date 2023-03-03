@@ -3,6 +3,7 @@ package ndc.approvalmatrix.service.javaservice.dao;
 import com.konylabs.middleware.controller.DataControllerResponse;
 import io.goodforgod.http.common.HttpStatus;
 import ndc.approvalmatrix.service.javaservice.commons.ApprovalConstants;
+import ndc.approvalmatrix.service.javaservice.commons.Queries;
 import ndc.approvalmatrix.service.javaservice.dto.RequestDto;
 
 import java.sql.Connection;
@@ -26,13 +27,11 @@ public class CancelRequestDao {
 
     public RequestDto cancelRequest(RequestDto requestDto) {
 
-
         try {
 
+            //String sqlWorkFlow="SELECT * FROM ndc_request WHERE  CONTRACTID=? AND  REFERENCENO=? AND  SOFTDELETE=0 ";
 
-            String sqlWorkFlow="SELECT * FROM ndc_request WHERE  CONTRACTID=? AND  REFERENCENO=? AND  SOFTDELETE=0 ";
-
-            PreparedStatement statement = connection.prepareStatement(sqlWorkFlow);
+            PreparedStatement statement = connection.prepareStatement(Queries.CR_QUERIES.CR_QUERY1);
 
             statement.setString(1, requestDto.getContractId());
             statement.setString(2, requestDto.getReferenceNo());
@@ -41,7 +40,7 @@ public class CancelRequestDao {
 
             if(resultSet.next()){
 
-                /// update request to reject  ///
+
 
                 // CHECKING SAME USER AS REQUESTER //
 
@@ -49,8 +48,8 @@ public class CancelRequestDao {
 
                     if (resultSet.getString("STATUS").equalsIgnoreCase(ApprovalConstants.IN_PROGRESS)) {
 
-                        String sqlCancel = "UPDATE ndc_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?  WHERE  REQUESTERID=? AND CONTRACTID=? AND REFERENCENO=?";
-                        PreparedStatement statement3 = connection.prepareStatement(sqlCancel);
+                       // String sqlCancel = "UPDATE ndc_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?  WHERE  REQUESTERID=? AND CONTRACTID=? AND REFERENCENO=?";
+                        PreparedStatement statement3 = connection.prepareStatement(Queries.CR_QUERIES.CR_QUERY2);
                         statement3.setString(1, ApprovalConstants.CANCEL);
                         statement3.setString(2, requestDto.getRemarks());
                         statement3.setString(3, LocalDateTime.now().toString());

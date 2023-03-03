@@ -1,6 +1,7 @@
 package ndc.approvalmatrix.service.javaservice.dao;
 
 import ndc.approvalmatrix.service.javaservice.commons.ApprovalConstants;
+import ndc.approvalmatrix.service.javaservice.commons.Queries;
 import ndc.approvalmatrix.service.javaservice.dto.RequestDto;
 
 import java.sql.Connection;
@@ -22,12 +23,12 @@ public class RejectRequestDao {
 
         try {
 
-            String sqlRequest="SELECT NR.ID,NR.CONTRACTID ,NR2.SEQUENCENO,NR2.ID AS REQID,NR2.RULEVALUE,NR.STATUS ,NR2.SEQSTATUS,NR2.STATUS as APPROVERSTATUS,NR2.GROUPSTATUS,NR.ISSEQUENTIAL FROM ndc_request NR  " +
-                    "INNER JOIN ndc_requestworkflow NR2 ON NR.ID =NR2.REQUESTID " +
-                    "WHERE NR.CONTRACTID =? AND  NR.ACCOUNTNO=?  AND NR2.APPROVERID =? AND NR.REFERENCENO =? " ;
+//            String sqlRequest="SELECT NR.ID,NR.CONTRACTID ,NR2.SEQUENCENO,NR2.ID AS REQID,NR2.RULEVALUE,NR.STATUS ,NR2.SEQSTATUS,NR2.STATUS as APPROVERSTATUS,NR2.GROUPSTATUS,NR.ISSEQUENTIAL FROM ndc_request NR  " +
+//                    "INNER JOIN ndc_requestworkflow NR2 ON NR.ID =NR2.REQUESTID " +
+//                    "WHERE NR.CONTRACTID =? AND  NR.ACCOUNTNO=?  AND NR2.APPROVERID =? AND NR.REFERENCENO =? " ;
 
 
-            PreparedStatement statementS = connection.prepareStatement(sqlRequest);
+            PreparedStatement statementS = connection.prepareStatement(Queries.RR_QUERIES.RR_QUERY1);
 
             statementS.setString(1,requestDto.getContractId());
             statementS.setString(2, requestDto.getAccountNo());
@@ -45,9 +46,9 @@ public class RejectRequestDao {
 
                     if(resultSet.getString("APPROVERSTATUS").equalsIgnoreCase(ApprovalConstants.PENDING)) {
 
-                        String sqlWorkFlow = "UPDATE ndc_requestworkflow SET  STATUS=?,GROUPSTATUS=?,SEQSTATUS=?, REMARKS=? WHERE ID=? ";
+                       // String sqlWorkFlow = "UPDATE ndc_requestworkflow SET  STATUS=?,GROUPSTATUS=?,SEQSTATUS=?, REMARKS=? WHERE ID=? ";
 
-                        PreparedStatement statement = connection.prepareStatement(sqlWorkFlow);
+                        PreparedStatement statement = connection.prepareStatement(Queries.RR_QUERIES.RR_QUERY2);
 
                         statement.setString(1, ApprovalConstants.REJECTED);
                         statement.setString(2, ApprovalConstants.REJECTED);
@@ -59,8 +60,8 @@ public class RejectRequestDao {
 
                         /// update request to reject  ///
 
-                        String sqlAssignToNextApprover2 = "UPDATE ndc_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?  WHERE ID=?";
-                        PreparedStatement statement3 = connection.prepareStatement(sqlAssignToNextApprover2);
+                       // String sqlAssignToNextApprover2 = "UPDATE ndc_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?  WHERE ID=?";
+                        PreparedStatement statement3 = connection.prepareStatement(Queries.RR_QUERIES.RR_QUERY3);
                         statement3.setString(1, ApprovalConstants.REJECTED);
                         statement3.setString(2, requestDto.getRemarks());
                         statement3.setString(3, LocalDateTime.now().toString());

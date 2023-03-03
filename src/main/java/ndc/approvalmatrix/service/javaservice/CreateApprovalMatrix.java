@@ -145,7 +145,8 @@ public class CreateApprovalMatrix implements JavaService2 {
             "  ]\n" +
             "}";
 
-    static String json3 = "{\"requestId\":\"0\",\"userId\":\"4646038518\",\"contractId\":\"8436131351\",\"isSequential\":\"1\",\"coreCustomerId\":\"102190\",\"approvalRowList\":[{\"workflowId\":1,\"sequenceNo\":1,\"groupNo\":1,\"approvalRule\":2,\"role\":\"Approver\",\"isChecker\":1},{\"workflowId\":1,\"sequenceNo\":1,\"groupNo\":2,\"approvalRule\":3,\"role\":\"Authorizer\",\"isChecker\":0},{\"workflowId\":1,\"sequenceNo\":2,\"groupNo\":1,\"approvalRule\":-1,\"role\":\"Administrator\",\"isChecker\":1},{\"workflowId\":2,\"sequenceNo\":1,\"groupNo\":1,\"approvalRule\":2,\"role\":\"Approver\",\"isChecker\":1},{\"workflowId\":2,\"sequenceNo\":1,\"groupNo\":2,\"approvalRule\":3,\"role\":\"Authorizer\",\"isChecker\":0}],\"accountNo\":\"1234545667\",\"workFlowFeatureActions\":[{\"workflowId\":1,\"isSequential\":0,\"featureActionId\":\"BILL_PAY_CREATE\",\"minAmount\":1,\"maxAmount\":50000},{\"workflowId\":2,\"isSequential\":1,\"featureActionId\":\"BILL_PAY_CREATE\",\"minAmount\":50001,\"maxAmount\":100000}]}";
+    static String json3 = "{\"requestId\":\"0\",\"userId\":\"4646038518\",\"contractId\":\"8436131351\",\"isSequential\":\"1\",\"coreCustomerId\":\"102190\",\"approvalRowList\":[{\"sequenceNo\":1,\"groupNo\":1,\"approvalRule\":2,\"role\":\"Approver\",\"isChecker\":1},{\"sequenceNo\":1,\"groupNo\":2,\"approvalRule\":3,\"role\":\"Authorizer\",\"isChecker\":0},{\"sequenceNo\":2,\"groupNo\":1,\"approvalRule\":-1,\"role\":\"Administrator\",\"isChecker\":1},{\"workflowId\":2,\"sequenceNo\":1,\"groupNo\":1,\"approvalRule\":2,\"role\":\"Approver\",\"isChecker\":1},{\"workflowId\":2,\"sequenceNo\":1,\"groupNo\":2,\"approvalRule\":3,\"role\":\"Authorizer\",\"isChecker\":0}],\"accountNo\":\"1234545667\",\"workFlowFeatureActions\":[{\"workflowId\":1,\"isSequential\":0,\"featureActionId\":\"BILL_PAY_CREATE\",\"minAmount\":1,\"maxAmount\":50000},{\"workflowId\":2,\"isSequential\":1,\"featureActionId\":\"BILL_PAY_CREATE\",\"minAmount\":50001,\"maxAmount\":100000}]}";
+    static String json4 = "{\"userId\":\"4646038518\",\"contractId\":\"8436131351\",\"accountNo\":\"1234545667\",\"approvalRowList\":[{\"sequenceNo\":1,\"groupNo\":1,\"approvalRule\":2,\"role\":\"Approver\",\"isChecker\":1},{\"sequenceNo\":1,\"groupNo\":2,\"approvalRule\":3,\"role\":\"Authorizer\",\"isChecker\":0},{\"sequenceNo\":2,\"groupNo\":1,\"approvalRule\":-1,\"role\":\"Administrator\",\"isChecker\":1}],\"workFlowFeatureActions\":[{\"isSequential\":0,\"featureActionId\":\"BILL_PAY_CREATE\",\"minAmount\":100001,\"maxAmount\":125000}],\"isEdit\":\"0\",\"workFlowId\":\"0\"}";
     @Override
     public Object invoke(String s, Object[] objects, DataControllerRequest dataControllerRequest, DataControllerResponse dataControllerResponse)  {
 
@@ -195,29 +196,29 @@ public class CreateApprovalMatrix implements JavaService2 {
         return result;
     }
 
-//    public static void main(String[] args) throws  SQLException {
-//
-//
-//        Connection connection = new DatabaseConnection().getDatabaseConnection();
-//        connection.setAutoCommit(false);         ;
-//
-//
-//        ApprovalRequestDto approvalRequestDto =  new Gson().fromJson(json3, ApprovalRequestDto.class);
-////        approvalRequestDto.setUserId("4646038518");
-////        approvalRequestDto.setContractId("8436131351");
-////        approvalRequestDto.setAccountNo("1234545667");
-////        approvalRequestDto.setIsSequential(1);
-////        approvalRequestDto.setCoreCustomerId("102190");
-//
-//        System.out.println("approvalRowList = " + new Gson().toJson(approvalRequestDto));
-//
-//        CreateApprovalMatrixDao approvalMatrixDao = new CreateApprovalMatrixDao(connection);
-//        String Message = approvalMatrixDao.createApprovalMatrix(approvalRequestDto);
-//
-//        System.out.println("Message = " + Message);
-//
-//        connection.commit();
-//        connection.close();
-//    }
+    public static void main(String[] args) throws  SQLException {
+
+
+        Connection connection = new DatabaseConnection().getDatabaseConnection();
+        connection.setAutoCommit(false);         ;
+
+
+        ApprovalRequestDto approvalRequestDto =  new Gson().fromJson(json4, ApprovalRequestDto.class);
+//        approvalRequestDto.setUserId("4646038518");
+//        approvalRequestDto.setContractId("8436131351");
+//        approvalRequestDto.setAccountNo("1234545667");
+//        approvalRequestDto.setIsSequential(1);
+//        approvalRequestDto.setCoreCustomerId("102190");
+
+        System.out.println("approvalRowList = " + new Gson().toJson(approvalRequestDto));
+
+        //CreateApprovalMatrixDao approvalMatrixDao = new CreateApprovalMatrixDao(connection);
+        //String Message = approvalMatrixDao.createApprovalMatrix(approvalRequestDto);
+
+      //  System.out.println("Message = " + Message);
+
+        connection.commit();
+        connection.close();
+    }
 
 }

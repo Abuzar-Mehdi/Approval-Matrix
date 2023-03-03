@@ -2,6 +2,7 @@ package ndc.approvalmatrix.service.javaservice.dao;
 
 import com.google.gson.Gson;
 import ndc.approvalmatrix.service.javaservice.commons.ApprovalConstants;
+import ndc.approvalmatrix.service.javaservice.commons.StoredProcedure;
 import ndc.approvalmatrix.service.javaservice.dto.FetchRequestDto;
 import ndc.approvalmatrix.service.javaservice.dto.RequestDto;
 import ndc.approvalmatrix.service.javaservice.dto.UserDto;
@@ -35,7 +36,7 @@ public class FetchAllMyPendingRequestDao {
             List<UserDto> userDtoList =  new ArrayList<>();
             CallableStatement callableStatement;
 
-            callableStatement = connection.prepareCall("{CALL "+ ApprovalConstants.FETCH_REQUEST +"(?)}");
+            callableStatement = connection.prepareCall("{CALL "+ StoredProcedure.FETCH_REQUEST +"(?)}");
             callableStatement.setString(1,requestDto.getRequesterId());
             callableStatement.execute();
 

@@ -1,5 +1,6 @@
 package ndc.approvalmatrix.service.javaservice.dao;
 
+import ndc.approvalmatrix.service.javaservice.commons.Queries;
 import ndc.approvalmatrix.service.javaservice.dto.FeatureAction;
 import ndc.approvalmatrix.service.javaservice.dto.FeatureActionConfigDto;
 
@@ -37,7 +38,7 @@ public class FeatureActionConfigDao {
                         "(featureactionid, name, contractid, createby, createdate, modifyby, modifydate,isenabled,accountno)" +
                         "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-                preparedStatement = connection.prepareStatement(sql);
+                preparedStatement = connection.prepareStatement(Queries.FAC_QUERIES.FAC_QUERY1);
 
                 for (FeatureAction featureAction : featureActionConfigDto.getFeatureActions()) {
 
@@ -69,7 +70,7 @@ public class FeatureActionConfigDao {
                         " SET featureactionid=?, name=?,  modifyby=?, modifydate=?, isenabled=?   " +
                         "WHERE contractid=? and  accountno=? and featureactionid=?  ";
 
-                preparedStatement = connection.prepareStatement(sql);
+                preparedStatement = connection.prepareStatement(Queries.FAC_QUERIES.FAC_QUERY2);
 
                 for (FeatureAction featureAction : featureActionConfigDto.getFeatureActions()) {
 

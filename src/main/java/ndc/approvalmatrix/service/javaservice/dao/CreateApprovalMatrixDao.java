@@ -1,6 +1,8 @@
 package ndc.approvalmatrix.service.javaservice.dao;
 
 import ndc.approvalmatrix.service.javaservice.commons.ApprovalConstants;
+import ndc.approvalmatrix.service.javaservice.commons.Queries;
+import ndc.approvalmatrix.service.javaservice.commons.StoredProcedure;
 import ndc.approvalmatrix.service.javaservice.dto.ApprovalRequestDto;
 import ndc.approvalmatrix.service.javaservice.dto.ApprovalRow;
 import ndc.approvalmatrix.service.javaservice.dto.WorkFlowFeatureAction;
@@ -26,25 +28,27 @@ public class CreateApprovalMatrixDao {
         String result;
         try {
 
-            String sqlMain = "SELECT id FROM ndc_am_matrix where contractid=? and accountno=? and softdelete=0";
+           // String sqlMain = "SELECT a.id,MAX(b.workflowid) as wid  FROM ndc_am_matrix a inner join ndc_am_matrix_detail b on a.id =b.matrixid  where a.contractid=? and a.accountno=? and softdelete=0";
 
-            PreparedStatement statementX = connection.prepareStatement(sqlMain);
+            PreparedStatement statementX = connection.prepareStatement(Queries.CAM_QUERY.CAM_QUERY1);
 
             statementX.setString(1,approvalRequestDto.getContractId()); //ContractID
             statementX.setString(2,approvalRequestDto.getAccountNo()); //ContractID
 
             ResultSet resultSet =  statementX.executeQuery();
 
-            if(resultSet.next()){
+            if(resultSet.next() && resultSet.getString("id") != null){
 
                 approvalRequestDto.setMatrixId(resultSet.getLong("id"));
+                int tempWid = resultSet.getInt("wid");
+                approvalRequestDto.setWorkFlowId(++tempWid);
 
             } else{
 
-                String sqlMaster = "INSERT INTO ndc_am_matrix (CONTRACTID, ACCOUNTNO,USERID )" +  //, ISSEQUENTIAL)" +
-                        "VALUES(?, ?, ?)";
+//                String sqlMaster = "INSERT INTO ndc_am_matrix (CONTRACTID, ACCOUNTNO,USERID )" +  //, ISSEQUENTIAL)" +
+//                        "VALUES(?, ?, ?)";
 
-                PreparedStatement statement = connection.prepareStatement(sqlMaster, Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement statement = connection.prepareStatement(Queries.CAM_QUERY.CAM_QUERY2, Statement.RETURN_GENERATED_KEYS);
 
                 statement.setString(1, approvalRequestDto.getContractId()); //ContractID
                 statement.setString(2, approvalRequestDto.getAccountNo()); //ContractID
@@ -55,12 +59,14 @@ public class CreateApprovalMatrixDao {
                 ResultSet keys = statement.getGeneratedKeys();
                 keys.next();
                 approvalRequestDto.setMatrixId(keys.getLong(1));
+                approvalRequestDto.setWorkFlowId(approvalRequestDto.getWorkFlowId() == 0 ? 1 : approvalRequestDto.getWorkFlowId());   ;
+
             }
 
 
             if(approvalRequestDto.getIsEdit() == 1){
 
-                CallableStatement callableStatement = connection.prepareCall("{CALL " + ApprovalConstants.REMOVE_TO_HISTORY + "(?,?,?)}");
+                CallableStatement callableStatement = connection.prepareCall("{CALL " + StoredProcedure.REMOVE_TO_HISTORY + "(?,?,?)}");
                 callableStatement.setLong(1, approvalRequestDto.getMatrixId());
                 callableStatement.setLong(2, approvalRequestDto.getWorkFlowId());
                 callableStatement.setString(3, approvalRequestDto.getUserId());
@@ -73,15 +79,15 @@ public class CreateApprovalMatrixDao {
 
                 String rule = null;
 
-                String sqlDetail = "INSERT INTO ndc_am_matrix_detail" +
-                        "(matrixid, workflowid, sequenceno, groupno, role, ischecker, rulevalue, rule,approvalorder)" +
-                        "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+//                String sqlDetail = "INSERT INTO ndc_am_matrix_detail" +
+//                        "(matrixid, workflowid, sequenceno, groupno, role, ischecker, rulevalue, rule,approvalorder)" +
+//                        "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 
-                PreparedStatement statement2 = connection.prepareStatement(sqlDetail);
+                PreparedStatement statement2 = connection.prepareStatement(Queries.CAM_QUERY.CAM_QUERY3);
 
                 statement2.setLong(1, approvalRequestDto.getMatrixId());
-                statement2.setInt(2, approvalRow.getWorkflowId());
+                statement2.setInt(2, approvalRequestDto.getWorkFlowId());
                 statement2.setInt(3, approvalRow.getSequenceNo());
                 statement2.setInt(4, approvalRow.getGroupNo() == null ? 1 : approvalRow.getGroupNo());
                 statement2.setString(5, approvalRow.getRole());
@@ -119,13 +125,13 @@ public class CreateApprovalMatrixDao {
 
             for ( WorkFlowFeatureAction workFlowFeatureAction : approvalRequestDto.getWorkFlowFeatureActions() ) {
 
-                String sql="INSERT INTO ndc_am_workflow " +
-                        "(matrixid, workflowid, issequential, featureactionid, minamount, maxamount) " +
-                        "VALUES(?, ?, ?, ?, ?, ?) ";
+//                String sql="INSERT INTO ndc_am_workflow " +
+//                        "(matrixid, workflowid, issequential, featureactionid, minamount, maxamount) " +
+//                        "VALUES(?, ?, ?, ?, ?, ?) ";
 
-                PreparedStatement statement1 = connection.prepareStatement(sql);
+                PreparedStatement statement1 = connection.prepareStatement(Queries.CAM_QUERY.CAM_QUERY4);
                 statement1.setLong(1, approvalRequestDto.getMatrixId());
-                statement1.setInt(2, workFlowFeatureAction.getWorkflowId());
+                statement1.setInt(2, approvalRequestDto.getWorkFlowId());
                 statement1.setInt(3, workFlowFeatureAction.getIsSequential());
                 statement1.setString(4, workFlowFeatureAction.getFeatureActionId());
                 statement1.setDouble(5, workFlowFeatureAction.getMinAmount());

@@ -1,5 +1,6 @@
 package ndc.approvalmatrix.service.javaservice.dao;
 
+import ndc.approvalmatrix.service.javaservice.commons.Queries;
 import ndc.approvalmatrix.service.javaservice.dto.ApprovalRow;
 import ndc.approvalmatrix.service.javaservice.dto.ApprovalWorkFlow;
 import ndc.approvalmatrix.service.javaservice.dto.WorkFlowFeatureAction;
@@ -33,9 +34,9 @@ public class GetWorkFlowDao {
 
         try {
 
-            String sqlMain = "SELECT id FROM ndc_am_matrix where contractid=? and accountno=? and softdelete=0 ";
+            //String sqlMain = "SELECT id FROM ndc_am_matrix where contractid=? and accountno=? and softdelete=0 ";
 
-            PreparedStatement statementM = connection.prepareStatement(sqlMain);
+            PreparedStatement statementM = connection.prepareStatement(Queries.GW_QUERIES.GW_QUERY1);
 
             statementM.setString(1,approvalWorkFlow.getContractId()); //ContractID
             statementM.setString(2,approvalWorkFlow.getAccountNo()); //AccountNo
@@ -47,9 +48,9 @@ public class GetWorkFlowDao {
                 approvalWorkFlow.setMatrixId(resultSet.getLong("id"));
             }
 
-            String sqlApprovalRow="SELECT workflowid,sequenceno,groupno,role,ischecker,rulevalue FROM ndc_am_matrix_detail where matrixid=? AND workflowid=? ";
+           // String sqlApprovalRow="SELECT workflowid,sequenceno,groupno,role,ischecker,rulevalue FROM ndc_am_matrix_detail where matrixid=? AND workflowid=? ";
 
-            PreparedStatement statement1 = connection.prepareStatement(sqlApprovalRow);
+            PreparedStatement statement1 = connection.prepareStatement(Queries.GW_QUERIES.GW_QUERY2);
 
             statement1.setLong(1,approvalWorkFlow.getMatrixId()); //Matrix
             statement1.setInt(2,approvalWorkFlow.getWorkflowId()); //workflow
@@ -68,9 +69,9 @@ public class GetWorkFlowDao {
                 approvalRows.add(approvalRow);
             }
 
-            String sqlWorkflowFeature="SELECT workflowid,issequential,featureactionid,minamount,maxamount FROM ndc_am_workflow where matrixid=? AND workflowid=? ";
+            //String sqlWorkflowFeature="SELECT workflowid,issequential,featureactionid,minamount,maxamount FROM ndc_am_workflow where matrixid=? AND workflowid=? ";
 
-            PreparedStatement statement2 = connection.prepareStatement(sqlWorkflowFeature);
+            PreparedStatement statement2 = connection.prepareStatement(Queries.GW_QUERIES.GW_QUERY3);
 
             statement2.setLong(1,approvalWorkFlow.getMatrixId()); //Matrix
             statement2.setInt(2,approvalWorkFlow.getWorkflowId()); //workflow

@@ -1,6 +1,7 @@
 package ndc.approvalmatrix.service.javaservice.dao;
 
 import ndc.approvalmatrix.service.javaservice.commons.ApprovalConstants;
+import ndc.approvalmatrix.service.javaservice.commons.StoredProcedure;
 import ndc.approvalmatrix.service.javaservice.dto.FetchRequestDto;
 import ndc.approvalmatrix.service.javaservice.dto.RequestDto;
 import ndc.approvalmatrix.service.javaservice.dto.UserDto;
@@ -34,7 +35,7 @@ public class FetchAllMyPendingApprovalsDao {
             List<UserDto> userDtoList =  new ArrayList<>();
             CallableStatement callableStatement;
 
-            callableStatement = connection.prepareCall("{CALL "+ ApprovalConstants.FETCH_APPROVAL +"(?)}");
+            callableStatement = connection.prepareCall("{CALL "+ StoredProcedure.FETCH_APPROVAL +"(?)}");
             callableStatement.setString(1,requestDto.getApproverId());
             callableStatement.execute();
 

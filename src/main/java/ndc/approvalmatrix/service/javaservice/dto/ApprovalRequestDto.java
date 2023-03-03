@@ -18,7 +18,7 @@ public class ApprovalRequestDto {
     private String userId;
     private String contractId;
     private String accountNo;
-    private Integer workFlowId;
+    private Integer workFlowId = 0;
     private List<ApprovalRow> approvalRowList;
     private List<WorkFlowFeatureAction> workFlowFeatureActions;
     private Long matrixId;

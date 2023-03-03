@@ -1,6 +1,8 @@
 package ndc.approvalmatrix.service.javaservice.dao;
 
 import ndc.approvalmatrix.service.javaservice.commons.ApprovalConstants;
+import ndc.approvalmatrix.service.javaservice.commons.Queries;
+import ndc.approvalmatrix.service.javaservice.commons.StoredProcedure;
 import ndc.approvalmatrix.service.javaservice.dto.RequestDto;
 
 import java.sql.*;
@@ -26,12 +28,12 @@ public class ApproveRequestDao {
         try {
 
 
-            String sqlRequest="SELECT NR.ID,NR.CONTRACTID ,NR2.SEQUENCENO,NR2.GROUPNO,NR2.ID AS REQID,NR2.RULEVALUE,NR.ISSEQUENTIAL,NR.STATUS ,NR2.SEQSTATUS,NR2.STATUS as APPROVERSTATUS ,NR2.GROUPSTATUS FROM ndc_am_request NR  " +
-                    "INNER JOIN ndc_am_instances NR2 ON NR.ID =NR2.REQUESTID " +
-                    "WHERE NR.CONTRACTID =? AND  NR.ACCOUNTNO=? AND NR2.APPROVERID =? AND NR.REFERENCENO =? " ;
-                   // "AND NR.STATUS =? AND NR2.SEQSTATUS =? AND NR2.STATUS=? ";
+//            String sqlRequest="SELECT NR.ID,NR.CONTRACTID ,NR2.SEQUENCENO,NR2.GROUPNO,NR2.ID AS REQID,NR2.RULEVALUE,NR.ISSEQUENTIAL,NR.STATUS ,NR2.SEQSTATUS,NR2.STATUS as APPROVERSTATUS ,NR2.GROUPSTATUS FROM ndc_am_request NR  " +
+//                    "INNER JOIN ndc_am_instances NR2 ON NR.ID =NR2.REQUESTID " +
+//                    "WHERE NR.CONTRACTID =? AND  NR.ACCOUNTNO=? AND NR2.APPROVERID =? AND NR.REFERENCENO =? " ;
+//
 
-            PreparedStatement statementS = connection.prepareStatement(sqlRequest);
+            PreparedStatement statementS = connection.prepareStatement(Queries.AR_QUERIES.AR_QUERY1);
 
             statementS.setString(1,requestDto.getContractId());
             statementS.setString(2, requestDto.getAccountNo());
@@ -53,10 +55,9 @@ public class ApproveRequestDao {
 
                     /// UPDATING REQUEST WORK FLOW STATUS ///
 
-                    //String sqlWorkFlow = "UPDATE ndc_requestworkflow SET  status=?, remarks=? WHERE requestid=? and approverid=? and sequenceno=?";
-                    String sqlWorkFlow = "UPDATE ndc_am_instances SET  STATUS=?, REMARKS=? WHERE ID=? ";
+                    //String sqlWorkFlow = "UPDATE ndc_am_instances SET  STATUS=?, REMARKS=? WHERE ID=? ";
 
-                    PreparedStatement statementU = connection.prepareStatement(sqlWorkFlow);
+                    PreparedStatement statementU = connection.prepareStatement(Queries.AR_QUERIES.AR_QUERY2);
 
                     statementU.setString(1, ApprovalConstants.APPROVED);
                     statementU.setString(2, requestDto.getRemarks());
@@ -68,15 +69,13 @@ public class ApproveRequestDao {
                     }
 
 
-
-                    CallableStatement callableStatement = connection.prepareCall("{CALL "+ ApprovalConstants.GET_GROUP_STATUS +"(?,?,?,?,?,?)}");
+                    CallableStatement callableStatement = connection.prepareCall("{CALL "+ StoredProcedure.GET_GROUP_STATUS +"(?,?,?,?,?,?)}");
                     callableStatement.setLong(1, requestDto.getRequestId());
                     callableStatement.setString(2, ApprovalConstants.APPROVED);
                     callableStatement.setInt(3, requestDto.getSequenceNo());
                     callableStatement.setInt(4, requestDto.getGroupNo());
                     callableStatement.setInt(5, requestDto.getRuleValue());
                     callableStatement.setInt(6, 0);
-                    //callableStatement.setInt(6, resultSet.getInt("ISSEQUENTIAL"));
                     callableStatement.execute();
 
                     ResultSet resultSet2 =callableStatement.getResultSet();
@@ -90,8 +89,8 @@ public class ApproveRequestDao {
 
                             // Updating group Status //
 
-                            String sqlAssignToNextApprove = "UPDATE ndc_am_instances SET  GROUPSTATUS=? WHERE REQUESTID=? AND SEQUENCENO=? AND  GROUPNO=?  ";
-                            PreparedStatement statement = connection.prepareStatement(sqlAssignToNextApprove);
+                          //  String sqlAssignToNextApprove = "UPDATE ndc_am_instances SET  GROUPSTATUS=? WHERE REQUESTID=? AND SEQUENCENO=? AND  GROUPNO=?  ";
+                            PreparedStatement statement = connection.prepareStatement(Queries.AR_QUERIES.AR_QUERY3);
                             statement.setString(1, ApprovalConstants.APPROVED);
                             statement.setLong(2, requestDto.getRequestId());
                             statement.setLong(3, requestDto.getSequenceNo());
@@ -99,7 +98,7 @@ public class ApproveRequestDao {
 
                             statement.executeUpdate();
 
-                            CallableStatement callableStatement1 = connection.prepareCall("{CALL "+ ApprovalConstants.GET_NON_SEQ_STATUS +"(?,?,?)}");
+                            CallableStatement callableStatement1 = connection.prepareCall("{CALL "+ StoredProcedure.GET_NON_SEQ_STATUS +"(?,?,?)}");
 
                             callableStatement1.setLong(1, requestDto.getRequestId());
                             callableStatement1.setString(2, ApprovalConstants.APPROVED);
@@ -112,16 +111,16 @@ public class ApproveRequestDao {
                             if (resultSet3.next()) {
 
 
-                                String sqlAssignToNextApprove1 = "UPDATE ndc_am_instances SET  SEQSTATUS=? WHERE REQUESTID=? AND SEQUENCENO=? ";
-                                PreparedStatement statement2 = connection.prepareStatement(sqlAssignToNextApprove1);
+                               // String sqlAssignToNextApprove1 = "UPDATE ndc_am_instances SET  SEQSTATUS=? WHERE REQUESTID=? AND SEQUENCENO=? ";
+                                PreparedStatement statement2 = connection.prepareStatement(Queries.AR_QUERIES.AR_QUERY4);
                                 statement2.setString(1, ApprovalConstants.APPROVED);
                                 statement2.setLong(2, requestDto.getRequestId());
                                 statement2.setInt(3, requestDto.getSequenceNo());
 
                                 statement2.executeUpdate();
 
-                                String sqlAssignToNextApprover2 = "UPDATE ndc_am_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?   WHERE ID=?";
-                                PreparedStatement statement3 = connection.prepareStatement(sqlAssignToNextApprover2);
+                               // String sqlAssignToNextApprover2 = "UPDATE ndc_am_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?   WHERE ID=?";
+                                PreparedStatement statement3 = connection.prepareStatement(Queries.AR_QUERIES.AR_QUERY5);
                                 statement3.setString(1, ApprovalConstants.APPROVED);
                                 statement3.setString(2, requestDto.getRemarks());
                                 statement3.setString(3, LocalDateTime.now().toString());
@@ -137,8 +136,8 @@ public class ApproveRequestDao {
                             else {
 
                                 int nextGroup = requestDto.getGroupNo();
-                                String sqlAssignToNextApprove1 = "UPDATE ndc_am_instances SET  STATUS=? , GROUPSTATUS=? ,SEQSTATUS=?  WHERE REQUESTID=? AND SEQUENCENO=? AND GROUPNO=? ";
-                                PreparedStatement statement2 = connection.prepareStatement(sqlAssignToNextApprove1);
+                               // String sqlAssignToNextApprove1 = "UPDATE ndc_am_instances SET  STATUS=? , GROUPSTATUS=? ,SEQSTATUS=?  WHERE REQUESTID=? AND SEQUENCENO=? AND GROUPNO=? ";
+                                PreparedStatement statement2 = connection.prepareStatement(Queries.AR_QUERIES.AR_QUERY6);
                                 statement2.setString(1, ApprovalConstants.PENDING);
                                 statement2.setString(2, ApprovalConstants.PENDING);
                                 statement2.setString(3, ApprovalConstants.PENDING);
@@ -148,8 +147,8 @@ public class ApproveRequestDao {
 
                             if (statement2.executeUpdate() >= 1) {
 
-                                String sqlAssignToNextApprover2 = "UPDATE ndc_am_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?  WHERE ID=?";
-                                PreparedStatement statement3 = connection.prepareStatement(sqlAssignToNextApprover2);
+                               // String sqlAssignToNextApprover2 = "UPDATE ndc_am_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?  WHERE ID=?";
+                                PreparedStatement statement3 = connection.prepareStatement(Queries.AR_QUERIES.AR_QUERY5);
                                 statement3.setString(1, ApprovalConstants.IN_PROGRESS);
                                 statement3.setString(2, requestDto.getRemarks());
                                 statement3.setString(3, LocalDateTime.now().toString());
@@ -163,8 +162,8 @@ public class ApproveRequestDao {
 
                             } else {
 
-                                String sqlAssignToNextApprover2 = "UPDATE ndc_am_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?   WHERE ID=?";
-                                PreparedStatement statement3 = connection.prepareStatement(sqlAssignToNextApprover2);
+                               // String sqlAssignToNextApprover2 = "UPDATE ndc_am_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?   WHERE ID=?";
+                                PreparedStatement statement3 = connection.prepareStatement(Queries.AR_QUERIES.AR_QUERY5);
                                 statement3.setString(1, ApprovalConstants.APPROVED);
                                 statement3.setString(2, requestDto.getRemarks());
                                 statement3.setString(3, LocalDateTime.now().toString());
@@ -179,8 +178,8 @@ public class ApproveRequestDao {
                             }
 
 
-                                String sqlAssignToNextApprover2 = "UPDATE ndc_am_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?  WHERE ID=?";
-                                PreparedStatement statement3 = connection.prepareStatement(sqlAssignToNextApprover2);
+                                //String sqlAssignToNextApprover2 = "UPDATE ndc_am_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?  WHERE ID=?";
+                                PreparedStatement statement3 = connection.prepareStatement(Queries.AR_QUERIES.AR_QUERY5);
                                 statement3.setString(1, ApprovalConstants.IN_PROGRESS);
                                 statement3.setString(2, requestDto.getRemarks());
                                 statement3.setString(3, LocalDateTime.now().toString());
@@ -199,8 +198,8 @@ public class ApproveRequestDao {
 
                             // Updating group Status //
 
-                            String sqlAssignToNextApprove = "UPDATE ndc_am_instances SET  GROUPSTATUS=? WHERE REQUESTID=? AND SEQUENCENO=? AND  GROUPNO=?  ";
-                            PreparedStatement statement = connection.prepareStatement(sqlAssignToNextApprove);
+                           // String sqlAssignToNextApprove = "UPDATE ndc_am_instances SET  GROUPSTATUS=? WHERE REQUESTID=? AND SEQUENCENO=? AND  GROUPNO=?  ";
+                            PreparedStatement statement = connection.prepareStatement(Queries.AR_QUERIES.AR_QUERY3);
                             statement.setString(1, ApprovalConstants.APPROVED);
                             statement.setLong(2, requestDto.getRequestId());
                             statement.setLong(3, requestDto.getSequenceNo());
@@ -208,7 +207,7 @@ public class ApproveRequestDao {
 
                             statement.executeUpdate();
 
-                            CallableStatement callableStatement1 = connection.prepareCall("{CALL "+ ApprovalConstants.GET_NON_SEQ_STATUS +"(?,?,?)}");
+                            CallableStatement callableStatement1 = connection.prepareCall("{CALL "+ StoredProcedure.GET_NON_SEQ_STATUS +"(?,?,?)}");
 
                             callableStatement1.setLong(1, requestDto.getRequestId());
                             callableStatement1.setString(2, ApprovalConstants.APPROVED);
@@ -221,16 +220,16 @@ public class ApproveRequestDao {
                             if (resultSet3.next()) {
 
 
-                                String sqlAssignToNextApprove1 = "UPDATE ndc_am_instances SET  SEQSTATUS=? WHERE REQUESTID=? AND SEQUENCENO=? ";
-                                PreparedStatement statement2 = connection.prepareStatement(sqlAssignToNextApprove1);
+                               // String sqlAssignToNextApprove1 = "UPDATE ndc_am_instances SET  SEQSTATUS=? WHERE REQUESTID=? AND SEQUENCENO=? ";
+                                PreparedStatement statement2 = connection.prepareStatement(Queries.AR_QUERIES.AR_QUERY4);
                                 statement2.setString(1, ApprovalConstants.APPROVED);
                                 statement2.setLong(2, requestDto.getRequestId());
                                 statement2.setInt(3, requestDto.getSequenceNo());
 
                                 statement2.executeUpdate();
 
-                                String sqlAssignToNextApprover2 = "UPDATE ndc_am_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?   WHERE ID=?";
-                                PreparedStatement statement3 = connection.prepareStatement(sqlAssignToNextApprover2);
+                               // String sqlAssignToNextApprover2 = "UPDATE ndc_am_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?   WHERE ID=?";
+                                PreparedStatement statement3 = connection.prepareStatement(Queries.AR_QUERIES.AR_QUERY5);
                                 statement3.setString(1, ApprovalConstants.APPROVED);
                                 statement3.setString(2, requestDto.getRemarks());
                                 statement3.setString(3, LocalDateTime.now().toString());
@@ -245,8 +244,8 @@ public class ApproveRequestDao {
                             }
                             else {
 
-                                String sqlAssignToNextApprove1 = "UPDATE ndc_am_instances SET  STATUS=?, GROUPSTATUS=?  WHERE REQUESTID=? AND SEQUENCENO=? AND STATUS=? AND GROUPSTATUS=? ";
-                                PreparedStatement statement2 = connection.prepareStatement(sqlAssignToNextApprove1);
+                               // String sqlAssignToNextApprove1 = "UPDATE ndc_am_instances SET  STATUS=?, GROUPSTATUS=?  WHERE REQUESTID=? AND SEQUENCENO=? AND STATUS=? AND GROUPSTATUS=? ";
+                                PreparedStatement statement2 = connection.prepareStatement(Queries.AR_QUERIES.AR_QUERY7);
                                 statement2.setString(1, ApprovalConstants.PENDING);
                                 statement2.setString(2, ApprovalConstants.PENDING);
                                 statement2.setLong(3, requestDto.getRequestId());
@@ -256,8 +255,8 @@ public class ApproveRequestDao {
 
                                 statement2.executeUpdate();
 
-                                String sqlAssignToNextApprover2 = "UPDATE ndc_am_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?  WHERE ID=?";
-                                PreparedStatement statement3 = connection.prepareStatement(sqlAssignToNextApprover2);
+                               // String sqlAssignToNextApprover2 = "UPDATE ndc_am_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?  WHERE ID=?";
+                                PreparedStatement statement3 = connection.prepareStatement(Queries.AR_QUERIES.AR_QUERY5);
                                 statement3.setString(1, ApprovalConstants.IN_PROGRESS);
                                 statement3.setString(2, requestDto.getRemarks());
                                 statement3.setString(3, LocalDateTime.now().toString());
@@ -274,8 +273,8 @@ public class ApproveRequestDao {
 
                     } else {
 
-                        String sqlAssignToNextApprover2 = "UPDATE ndc_am_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?  WHERE ID=?";
-                        PreparedStatement statement3 = connection.prepareStatement(sqlAssignToNextApprover2);
+                       // String sqlAssignToNextApprover2 = "UPDATE ndc_am_request SET  STATUS=? , REMARKS=? , MODIFYDATE=? , MODIFYBY=?  WHERE ID=?";
+                        PreparedStatement statement3 = connection.prepareStatement(Queries.AR_QUERIES.AR_QUERY5);
                         statement3.setString(1, ApprovalConstants.IN_PROGRESS);
                         statement3.setString(2, requestDto.getRemarks());
                         statement3.setString(3, LocalDateTime.now().toString());

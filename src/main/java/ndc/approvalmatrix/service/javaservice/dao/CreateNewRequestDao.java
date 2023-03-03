@@ -7,6 +7,8 @@ import com.konylabs.middleware.dataobject.Result;
 import com.mysql.cj.xdevapi.PreparableStatement;
 
 import ndc.approvalmatrix.service.javaservice.commons.ApprovalConstants;
+import ndc.approvalmatrix.service.javaservice.commons.Queries;
+import ndc.approvalmatrix.service.javaservice.commons.StoredProcedure;
 import ndc.approvalmatrix.service.javaservice.dto.RequestDto;
 
 public class CreateNewRequestDao {
@@ -27,7 +29,7 @@ public class CreateNewRequestDao {
 		try {
 
 
-			CallableStatement callableStatement = connection.prepareCall("{CALL " + ApprovalConstants.GET_FEATUREACTION_APPROVER_LIMIT + "(?,?,?,?)}");
+			CallableStatement callableStatement = connection.prepareCall("{CALL " + StoredProcedure.GET_FEATURE_ACTION_APPROVER_LIMIT + "(?,?,?,?)}");
 			callableStatement.setString(1, requestDto.getContractId());
 			callableStatement.setString(2, requestDto.getAccountNo());
 			callableStatement.setString(3, requestDto.getFeatureActionId());
@@ -43,7 +45,7 @@ public class CreateNewRequestDao {
 				requestDto.setIsSequential(	resultSetx.getInt("issequential"));
 
 				int i = 0;
-				CallableStatement callableStatement1 = connection.prepareCall("{CALL " + ApprovalConstants.GET_CONTRACT_WORKFLOW + "(?,?,?)}");
+				CallableStatement callableStatement1 = connection.prepareCall("{CALL " + StoredProcedure.GET_CONTRACT_WORKFLOW + "(?,?,?)}");
 				callableStatement1.setString(1, requestDto.getContractId());
 				callableStatement1.setString(2, requestDto.getAccountNo());
 				callableStatement1.setInt(3, requestDto.getWorkflowId());
@@ -55,15 +57,14 @@ public class CreateNewRequestDao {
 
 				while (resultSet.next()) {
 
-					System.out.println("resultSet.getString(\"role\") = " + resultSet.getString("role"));
-					
+
 					if (i == 0) {
 
-						String sqlString = "INSERT INTO ndc_am_request" +
-								"(matrixid, requesterid,  status,  modifyby, remarks, referenceno, featureactionid,contractId,issequential,accountno,workflowid)" +
-								"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+//						String sqlString = "INSERT INTO ndc_am_request" +
+//								"(matrixid, requesterid,  status,  modifyby, remarks, referenceno, featureactionid,contractId,issequential,accountno,workflowid)" +
+//								"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-						PreparedStatement statementRequest = connection.prepareStatement(sqlString, Statement.RETURN_GENERATED_KEYS);
+						PreparedStatement statementRequest = connection.prepareStatement(Queries.CNR_QUERIES.CNR_QUERY1, Statement.RETURN_GENERATED_KEYS);
 
 						statementRequest.setLong(1, resultSet.getLong("ID"));
 						statementRequest.setString(2, requestDto.getRequesterId());
@@ -89,18 +90,18 @@ public class CreateNewRequestDao {
 					}
 					i++;
 
-					String sqlRoleMember = "SELECT A.CUSTOMER_ID AS APPROVERID FROM customergroup A " +
-							"INNER JOIN membergroup B  ON A.GROUP_ID = B.ID " +
-							"WHERE A.CONTRACTID =? AND A.CORECUSTOMERID =? AND B.NAME =? ";
+//					String sqlRoleMember = "SELECT A.CUSTOMER_ID AS APPROVERID FROM customergroup A " +
+//							"INNER JOIN membergroup B  ON A.GROUP_ID = B.ID " +
+//							"WHERE A.CONTRACTID =? AND A.CORECUSTOMERID =? AND B.NAME =? ";
 
 					int count=0;
 					if(resultSet.getInt("RULEVALUE") == -1){
 
-						String sqlRoleMember1 = "SELECT count(B.NAME) as count  FROM customergroup A " +
-								"INNER JOIN membergroup B  ON A.GROUP_ID = B.ID " +
-								"WHERE A.CONTRACTID =? AND A.CORECUSTOMERID =? AND B.NAME =? ";
+//						String sqlRoleMember1 = "SELECT count(B.NAME) as count  FROM customergroup A " +
+//								"INNER JOIN membergroup B  ON A.GROUP_ID = B.ID " +
+//								"WHERE A.CONTRACTID =? AND A.CORECUSTOMERID =? AND B.NAME =? ";
 
-						PreparedStatement statement2x = connection.prepareStatement(sqlRoleMember1);
+						PreparedStatement statement2x = connection.prepareStatement(Queries.CNR_QUERIES.CNR_QUERY3);
 						statement2x.setString(1, requestDto.getContractId());
 						statement2x.setString(2, requestDto.getCoreCustomerId());
 						statement2x.setString(3, resultSet.getString("role"));
@@ -112,7 +113,7 @@ public class CreateNewRequestDao {
 						}
 					}
 
-					PreparedStatement statement2 = connection.prepareStatement(sqlRoleMember);
+					PreparedStatement statement2 = connection.prepareStatement(Queries.CNR_QUERIES.CNR_QUERY2);
 					statement2.setString(1, requestDto.getContractId());
 					statement2.setString(2, requestDto.getCoreCustomerId());
 					statement2.setString(3, resultSet.getString("role"));
@@ -122,11 +123,11 @@ public class CreateNewRequestDao {
 					while(resultSet1.next()) {
 
 
-						String sqlWorkflow = "INSERT INTO ndc_am_instances" +
-								"(requestid, approverid, sequenceno, approverorder, approvedate, status, remarks, rulevalue, seqstatus,groupno,groupstatus)" +
-								"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+//						String sqlWorkflow = "INSERT INTO ndc_am_instances" +
+//								"(requestid, approverid, sequenceno, approverorder, approvedate, status, remarks, rulevalue, seqstatus,groupno,groupstatus)" +
+//								"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-						PreparedStatement statement1 = connection.prepareStatement(sqlWorkflow);
+						PreparedStatement statement1 = connection.prepareStatement(Queries.CNR_QUERIES.CNR_QUERY4);
 
 						//if (requestDto.getIsSequential() == 1) {
 
