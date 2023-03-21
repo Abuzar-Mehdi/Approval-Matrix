@@ -14,4 +14,5 @@ public class StoredProcedure {
     public static final String GET_FEATURE_ACTION_APPROVER_LIMIT ="ndc_getapproverfeatureactionlimiagainstcontractaccount";
 
     public static final String REMOVE_TO_HISTORY ="ndc_transfermatrixtohistory";
+    public static final String GET_FEATURE_ACTION="ndc_getApprovalMatrixFeatureAction";
 }

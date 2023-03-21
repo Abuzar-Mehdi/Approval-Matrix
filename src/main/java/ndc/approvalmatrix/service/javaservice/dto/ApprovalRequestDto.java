@@ -23,4 +23,5 @@ public class ApprovalRequestDto {
     private List<WorkFlowFeatureAction> workFlowFeatureActions;
     private Long matrixId;
     private Integer isEdit;
+    private Integer isAllAccount = 0;
 }

@@ -1,14 +1,14 @@
 package ndc.approvalmatrix.service.javaservice.dao;
 
+import ndc.approvalmatrix.service.javaservice.commons.ApprovalConstants;
 import ndc.approvalmatrix.service.javaservice.commons.Queries;
+import ndc.approvalmatrix.service.javaservice.commons.StoredProcedure;
 import ndc.approvalmatrix.service.javaservice.dto.ApprovalRow;
 import ndc.approvalmatrix.service.javaservice.dto.ApprovalWorkFlow;
 import ndc.approvalmatrix.service.javaservice.dto.WorkFlowFeatureAction;
+import org.json.HTTP;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,38 +56,114 @@ public class GetWorkFlowDao {
             statement1.setInt(2,approvalWorkFlow.getWorkflowId()); //workflow
             ResultSet resultSet1 =  statement1.executeQuery();
 
-            while(resultSet1.next()){
+            if(resultSet1.next() == false ) {
 
-                ApprovalRow approvalRow = new ApprovalRow();
-                approvalRow.setWorkflowId(resultSet1.getInt("workflowid"));
-                approvalRow.setSequenceNo(resultSet1.getInt("sequenceno"));
-                approvalRow.setGroupNo(resultSet1.getInt("groupno"));
-                approvalRow.setRole(resultSet1.getString("role"));
-                approvalRow.setIsChecker(resultSet1.getInt("ischecker"));
-                approvalRow.setApprovalRule(resultSet1.getInt("rulevalue"));
+                approvalWorkFlow.setResponse(444);
 
-                approvalRows.add(approvalRow);
+            }else{
+
+                do {
+
+                    ApprovalRow approvalRow = new ApprovalRow();
+                    approvalRow.setWorkflowId(resultSet1.getInt("workflowid"));
+                    approvalRow.setSequenceNo(resultSet1.getInt("sequenceno"));
+                    approvalRow.setGroupNo(resultSet1.getInt("groupno"));
+                    approvalRow.setRole(resultSet1.getString("role"));
+                    approvalRow.setIsChecker(resultSet1.getInt("ischecker"));
+                    //approvalRow.setApprovalRule(resultSet1.getInt("rulevalue"));
+
+                    Integer rule = resultSet1.getInt("rulevalue");
+
+                    if (ApprovalConstants.ANY_ONE_VALUE.equals(rule)) {
+
+                        //rule = ApprovalConstants.ANY_ONE_VALUE;
+                        approvalRow.setApprovalRule(ApprovalConstants.ANY_ONE);
+
+                    } else if (ApprovalConstants.ANY_TWO_VALUE.equals(rule)) {
+
+                        // rule = ApprovalConstants.ANY_TWO_VALUE;
+                        approvalRow.setApprovalRule(ApprovalConstants.ANY_TWO);
+
+                    } else if (ApprovalConstants.ANY_THREE_VALUE.equals(rule)) {
+
+                        //rule = ApprovalConstants.ANY_THREE_VALUE;
+                        approvalRow.setApprovalRule(ApprovalConstants.ANY_THREE);
+
+                    } else if (ApprovalConstants.ANY_FOUR_VALUE.equals(rule)) {
+
+                        // rule = ApprovalConstants.ANY_FOUR_VALUE;
+                        approvalRow.setApprovalRule(ApprovalConstants.ANY_FOUR);
+
+                    } else if (ApprovalConstants.ALL_VALUE.equals(rule)) {
+
+                        // rule = ApprovalConstants.ALL_VALUE;
+                        approvalRow.setApprovalRule(ApprovalConstants.ALL);
+
+                    }
+
+                    approvalRows.add(approvalRow);
+
+                }while (resultSet1.next());
+
+                approvalWorkFlow.setResponse(200);
+
             }
 
-            //String sqlWorkflowFeature="SELECT workflowid,issequential,featureactionid,minamount,maxamount FROM ndc_am_workflow where matrixid=? AND workflowid=? ";
+            CallableStatement callableStatement = connection.prepareCall("{CALL "+ StoredProcedure.GET_FEATURE_ACTION +"(?,?)}");
+            callableStatement.setString(1, approvalWorkFlow.getContractId());
+            callableStatement.setString(2, approvalWorkFlow.getAccountNo());
 
-            PreparedStatement statement2 = connection.prepareStatement(Queries.GW_QUERIES.GW_QUERY3);
+            callableStatement.execute();
 
-            statement2.setLong(1,approvalWorkFlow.getMatrixId()); //Matrix
-            statement2.setInt(2,approvalWorkFlow.getWorkflowId()); //workflow
-            ResultSet resultSet2 =  statement2.executeQuery();
+            ResultSet resultSet2 =  callableStatement.getResultSet();
 
-            while (resultSet2.next()){
+            if(resultSet2.next() == false ) {
 
-                WorkFlowFeatureAction workFlowFeatureAction = new WorkFlowFeatureAction();
+                approvalWorkFlow.setResponse(444);
 
-                workFlowFeatureAction.setWorkflowId(resultSet2.getInt("workflowid"));
-                workFlowFeatureAction.setIsSequential(resultSet2.getInt("issequential"));
-                workFlowFeatureAction.setFeatureActionId(resultSet2.getString("featureactionid"));
-                workFlowFeatureAction.setMinAmount(resultSet2.getDouble("minamount"));
-                workFlowFeatureAction.setMaxAmount(resultSet2.getDouble("maxamount"));
+            }else{
 
-                workFlowFeatureActions.add(workFlowFeatureAction);
+                do {
+
+                    //String sqlWorkflowFeature="SELECT workflowid,issequential,featureactionid,minamount,maxamount FROM ndc_am_workflow where matrixid=? AND workflowid=? ";
+
+                    PreparedStatement statement2 = connection.prepareStatement(Queries.GW_QUERIES.GW_QUERY3);
+
+                    statement2.setLong(1, approvalWorkFlow.getMatrixId()); //Matrix
+                    statement2.setInt(2, approvalWorkFlow.getWorkflowId()); //workflow
+                    statement2.setString(3, resultSet2.getString("featureactionid"));
+                    ResultSet resultSet3 = statement2.executeQuery();
+
+                    WorkFlowFeatureAction workFlowFeatureAction;
+
+                    if (resultSet3.next()) {
+
+                        workFlowFeatureAction = new WorkFlowFeatureAction();
+
+                        workFlowFeatureAction.setWorkflowId(resultSet3.getInt("workflowid"));
+                        workFlowFeatureAction.setIsSequential(resultSet3.getInt("issequential"));
+                        workFlowFeatureAction.setFeatureActionId(resultSet3.getString("featureactionid"));
+                        workFlowFeatureAction.setMinAmount(resultSet3.getDouble("minamount"));
+                        workFlowFeatureAction.setMaxAmount(resultSet3.getDouble("maxamount"));
+
+
+                    } else {
+
+                        workFlowFeatureAction = new WorkFlowFeatureAction();
+
+                        workFlowFeatureAction.setWorkflowId(approvalWorkFlow.getWorkflowId());
+                        workFlowFeatureAction.setIsSequential(resultSet2.getInt("issequential"));
+                        workFlowFeatureAction.setFeatureActionId(resultSet2.getString("featureactionid"));
+                        workFlowFeatureAction.setMinAmount(0d);
+                        workFlowFeatureAction.setMaxAmount(0d);
+                    }
+
+                    workFlowFeatureActions.add(workFlowFeatureAction);
+
+                }while (resultSet2.next());
+
+                approvalWorkFlow.setResponse(200);
+
             }
 
             approvalWorkFlow.setApprovalRowList(approvalRows);
@@ -96,6 +172,7 @@ public class GetWorkFlowDao {
         }catch (Exception exception){
 
             try {
+                exception.printStackTrace();
                 result ="Error in getting Approval workFlow :";
                 connection.rollback();
                 connection.close();

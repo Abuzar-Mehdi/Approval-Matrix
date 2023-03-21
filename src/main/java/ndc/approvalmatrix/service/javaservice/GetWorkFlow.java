@@ -65,36 +65,36 @@ public class GetWorkFlow implements JavaService2 {
         return result;
     }
 
-//    public static void main(String[] args)  {
-//
-//
-//        Connection connection = null;
-//        try {
-//
-//            connection = new DatabaseConnection().getDatabaseConnection();
-//            connection.setAutoCommit(false);
-//
-//
-//            ApprovalWorkFlow approvalWorkFlow = new ApprovalWorkFlow();
-//
-//          //  approvalWorkFlow.setMatrixId(Long.valueOf(dataControllerRequest.getParameter("matrixId")));
-//            approvalWorkFlow.setContractId("8436131351");
-//            approvalWorkFlow.setAccountNo("1234545667");
-//            approvalWorkFlow.setWorkflowId(1);
-//
-//
-//            GetWorkFlowDao getWorkFlowDao = new GetWorkFlowDao(connection);
-//
-//
-//            System.out.println("workflow :"+ new Gson().toJson(getWorkFlowDao.getApprovalWorkFlow(approvalWorkFlow)));
-//
-//            connection.commit();
-//            connection.close();
-//
-//        }catch (Exception exception){
-//
-//
-//        }
-//
-//    }
+    public static void main(String[] args)  {
+
+
+        Connection connection = null;
+        try {
+
+            connection = new DatabaseConnection().getDatabaseConnection();
+            connection.setAutoCommit(false);
+
+
+            ApprovalWorkFlow approvalWorkFlow = new ApprovalWorkFlow();
+
+          //  approvalWorkFlow.setMatrixId(Long.valueOf(dataControllerRequest.getParameter("matrixId")));
+            approvalWorkFlow.setContractId("8436131351");
+            approvalWorkFlow.setAccountNo("86612");
+            approvalWorkFlow.setWorkflowId(6);
+
+
+            GetWorkFlowDao getWorkFlowDao = new GetWorkFlowDao(connection);
+
+
+            System.out.println("workflow :"+ new Gson().toJson(getWorkFlowDao.getApprovalWorkFlow(approvalWorkFlow)));
+
+            connection.commit();
+            connection.close();
+
+        }catch (Exception exception){
+
+
+        }
+
+    }
 }

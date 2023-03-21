@@ -40,8 +40,8 @@ public class ApprovalConstants {
 
     public static final String ALL ="All Approvals";
     public static final String ANY_ONE ="Any one approval";
-    public static final String ANY_TWO ="Any two approval";
-    public static final String ANY_THREE ="Any three approval";
+    public static final String ANY_TWO ="Any two approvals";
+    public static final String ANY_THREE ="Any three approvals";
     public static final String ANY_FOUR ="Any four approval";
 
 

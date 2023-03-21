@@ -17,4 +17,5 @@ public class ApprovalWorkFlow {
     private Integer workflowId;
     private List<ApprovalRow> approvalRowList;
     private List<WorkFlowFeatureAction> workFlowFeatureActions;
+    private Integer response;
 }

@@ -11,6 +11,6 @@ public class WorkFlowFeatureAction {
     private Integer workflowId;
     private Integer isSequential;
     private String featureActionId;
-    private Double minAmount;
-    private Double maxAmount;
+    private Double minAmount=0d;
+    private Double maxAmount=0d;
 }

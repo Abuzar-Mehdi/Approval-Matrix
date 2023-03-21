@@ -28,6 +28,14 @@ public class CreateApprovalMatrixDao {
         String result;
         try {
 
+            /*if(approvalRequestDto.getIsAllAccount() == 1){
+
+            }
+
+            PreparedStatement preparedStatement = connection.prepareStatement(Queries.CAM_QUERY.CAM_QUERY5);
+            preparedStatement.setString(1,approvalRequestDto.getContractId());*/
+
+
            // String sqlMain = "SELECT a.id,MAX(b.workflowid) as wid  FROM ndc_am_matrix a inner join ndc_am_matrix_detail b on a.id =b.matrixid  where a.contractid=? and a.accountno=? and softdelete=0";
 
             PreparedStatement statementX = connection.prepareStatement(Queries.CAM_QUERY.CAM_QUERY1);
@@ -37,13 +45,21 @@ public class CreateApprovalMatrixDao {
 
             ResultSet resultSet =  statementX.executeQuery();
 
-            if(resultSet.next() && resultSet.getString("id") != null){
+            if(resultSet.next() ){
 
-                approvalRequestDto.setMatrixId(resultSet.getLong("id"));
-                int tempWid = resultSet.getInt("wid");
-                approvalRequestDto.setWorkFlowId(++tempWid);
+                if(resultSet.getString("id") != null && approvalRequestDto.getIsEdit() != 1){
 
-            } else{
+                    approvalRequestDto.setMatrixId(resultSet.getLong("id"));
+                    int tempWid = resultSet.getInt("wid");
+                    approvalRequestDto.setWorkFlowId(++tempWid);
+                }
+                else if(resultSet.getString("id") != null && approvalRequestDto.getIsEdit() == 1){
+
+                    approvalRequestDto.setMatrixId(resultSet.getLong("id"));
+                }
+
+            }
+            else{
 
 //                String sqlMaster = "INSERT INTO ndc_am_matrix (CONTRACTID, ACCOUNTNO,USERID )" +  //, ISSEQUENTIAL)" +
 //                        "VALUES(?, ?, ?)";
@@ -77,7 +93,7 @@ public class CreateApprovalMatrixDao {
 
             for(ApprovalRow approvalRow : approvalRequestDto.getApprovalRowList()) {
 
-                String rule = null;
+                Integer rule = null;
 
 //                String sqlDetail = "INSERT INTO ndc_am_matrix_detail" +
 //                        "(matrixid, workflowid, sequenceno, groupno, role, ischecker, rulevalue, rule,approvalorder)" +
@@ -93,30 +109,30 @@ public class CreateApprovalMatrixDao {
                 statement2.setString(5, approvalRow.getRole());
                 statement2.setInt(6, approvalRow.getIsChecker());
 
-                if (ApprovalConstants.ANY_ONE_VALUE.equals(approvalRow.getApprovalRule())) {
+                if (ApprovalConstants.ANY_ONE.equalsIgnoreCase(approvalRow.getApprovalRule())) {
 
-                    rule = ApprovalConstants.ANY_ONE;
+                    rule = ApprovalConstants.ANY_ONE_VALUE;
 
-                } else if (ApprovalConstants.ANY_TWO_VALUE.equals(approvalRow.getApprovalRule())) {
+                } else if (ApprovalConstants.ANY_TWO.equalsIgnoreCase(approvalRow.getApprovalRule())) {
 
-                    rule = ApprovalConstants.ANY_TWO;
+                    rule = ApprovalConstants.ANY_TWO_VALUE;
 
-                } else if (ApprovalConstants.ANY_THREE_VALUE.equals(approvalRow.getApprovalRule())) {
+                } else if (ApprovalConstants.ANY_THREE.equalsIgnoreCase(approvalRow.getApprovalRule())) {
 
-                    rule = ApprovalConstants.ANY_THREE;
+                    rule = ApprovalConstants.ANY_THREE_VALUE;
 
-                } else if (ApprovalConstants.ANY_FOUR_VALUE.equals(approvalRow.getApprovalRule())) {
+                } else if (ApprovalConstants.ANY_FOUR.equalsIgnoreCase(approvalRow.getApprovalRule())) {
 
-                    rule = ApprovalConstants.ANY_FOUR;
+                    rule = ApprovalConstants.ANY_FOUR_VALUE;
 
-                } else if (ApprovalConstants.ALL_VALUE.equals(approvalRow.getApprovalRule())) {
+                } else if (ApprovalConstants.ALL.equalsIgnoreCase(approvalRow.getApprovalRule())) {
 
-                    rule = ApprovalConstants.ALL;
+                    rule = ApprovalConstants.ALL_VALUE;
 
                 }
 
-                statement2.setInt(7, approvalRow.getApprovalRule());
-                statement2.setString(8, rule);
+                statement2.setInt(7, rule);
+                statement2.setString(8, approvalRow.getApprovalRule());
                 statement2.setInt(9, approvalRow.getGroupNo() == null ? 1 : approvalRow.getGroupNo());
 
                 statement2.executeUpdate();
@@ -141,7 +157,12 @@ public class CreateApprovalMatrixDao {
 
             }
 
-            result="Approval Matrix Successfully created :"+approvalRequestDto.getMatrixId();
+            if(approvalRequestDto.getIsEdit() == 1){
+
+                result = "Approval Matrix Successfully Modified :" + approvalRequestDto.getMatrixId();
+            }else {
+                result = "Approval Matrix Successfully created :" + approvalRequestDto.getMatrixId();
+            }
 
         }catch (Exception exception){
 

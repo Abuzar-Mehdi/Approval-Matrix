@@ -41,7 +41,7 @@ public class FeatureActionConfig implements JavaService2 {
             "    ]\n" +
             "  }";
 
-
+    static String json2 = "{\"featureActions\":[{\"featureActionId\":\"BILL_PAY_CREATE\",\"name\":\"Initiate Bill Payments\",\"isEnabled\":1}]}";
 
     @Override
     public Object invoke(String s, Object[] objects, DataControllerRequest dataControllerRequest, DataControllerResponse dataControllerResponse)  {
@@ -69,7 +69,7 @@ public class FeatureActionConfig implements JavaService2 {
            featureActionConfigDto.setCreateBy(dataControllerRequest.getParameter("createBy"));
            featureActionConfigDto.setModifyBy(dataControllerRequest.getParameter("modifyBy"));
            featureActionConfigDto.setIsInsert(Integer.valueOf(dataControllerRequest.getParameter("isInsert")));
-
+           featureActionConfigDto.setAccountNo(dataControllerRequest.getParameter("accountNo"));
            FeatureActionConfigDao featureActionConfigDao = new FeatureActionConfigDao(connection);
            result.addParam("data", featureActionConfigDao.createFeatureActionConfiguration(featureActionConfigDto));
 
@@ -88,25 +88,25 @@ public class FeatureActionConfig implements JavaService2 {
         return result;
     }
 
-//    public static void main(String[] args) throws SQLException {
-//
-//
-//        Connection connection = new DatabaseConnection().getDatabaseConnection();
-//        connection.setAutoCommit(false);
-//
-//        FeatureActionConfigDto featureActionConfigDto = new Gson().fromJson(json, FeatureActionConfigDto.class);
-//
-//        featureActionConfigDto.setContractId("8436131351");
-//        featureActionConfigDto.setCreateBy("11883");
-//        featureActionConfigDto.setModifyBy("11883");
-//        featureActionConfigDto.setIsInsert(0);
-//        featureActionConfigDto.setAccountNo("1234545667");
-//
-//        FeatureActionConfigDao featureActionConfigDao = new FeatureActionConfigDao(connection);
-//        //result.addParam("data", featureActionConfigDao.createFeatureActionConfiguration(featureActionConfigDto));
-//
-//        System.out.println("featureActionConfigDao = " + featureActionConfigDao.createFeatureActionConfiguration(featureActionConfigDto));
-//        connection.commit();
-//        connection.close();
-//    }
+    public static void main(String[] args) throws SQLException {
+
+
+        Connection connection = new DatabaseConnection().getDatabaseConnection();
+        connection.setAutoCommit(false);
+
+        FeatureActionConfigDto featureActionConfigDto = new Gson().fromJson(json2, FeatureActionConfigDto.class);
+
+        featureActionConfigDto.setContractId("8436131351");
+        featureActionConfigDto.setCreateBy("11883");
+        featureActionConfigDto.setModifyBy("11883");
+        featureActionConfigDto.setIsInsert(0);
+        featureActionConfigDto.setAccountNo("1234545667");
+
+        FeatureActionConfigDao featureActionConfigDao = new FeatureActionConfigDao(connection);
+        //result.addParam("data", featureActionConfigDao.createFeatureActionConfiguration(featureActionConfigDto));
+
+        System.out.println("featureActionConfigDao = " + featureActionConfigDao.createFeatureActionConfiguration(featureActionConfigDto));
+        connection.commit();
+        connection.close();
+    }
 }
