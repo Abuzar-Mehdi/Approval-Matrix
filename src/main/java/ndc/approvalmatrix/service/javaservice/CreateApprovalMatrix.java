@@ -27,7 +27,10 @@ public class CreateApprovalMatrix implements JavaService2 {
    static String json7="{\"userId\":\"admin1\",\"contractId\":\"8436131351\",\"accountNo\":\"1234545667\",\"approvalRowList\":[{\"workflowId\":1,\"sequenceNo\":0,\"approvalRule\":\"Approver\",\"role\":\"Any two approvals\",\"isChecker\":0},{\"workflowId\":1,\"sequenceNo\":0,\"approvalRule\":\"Authorizer\",\"role\":\"Any three approvals\",\"isChecker\":0},{\"workflowId\":1,\"sequenceNo\":0,\"approvalRule\":\"Administrator\",\"role\":\"All Approvals\",\"isChecker\":0}],\"workFlowFeatureActions\":[{\"workflowId\":1,\"isSequential\":0,\"featureActionId\":\"ACH_PAYMENT_CREATE\",\"minAmount\":1,\"maxAmount\":100000},{\"workflowId\":1,\"isSequential\":0,\"featureActionId\":\"BILL_PAY_CREATE\",\"minAmount\":1,\"maxAmount\":50000},{\"workflowId\":1,\"isSequential\":0,\"featureActionId\":\"BULK_PAYMENT_REQUEST_SUBMIT\",\"minAmount\":\"1\",\"maxAmount\":\"100\"},{\"workflowId\":1,\"isSequential\":0,\"featureActionId\":\"INTERNATIONAL_ACCOUNT_FUND_TRANSFER_CREATE\",\"minAmount\":0,\"maxAmount\":0},{\"workflowId\":1,\"isSequential\":0,\"featureActionId\":\"INTERNATIONAL_WIRE_TRANSFER_CREATE\",\"minAmount\":0,\"maxAmount\":0},{\"workflowId\":1,\"isSequential\":0,\"featureActionId\":\"DOMESTIC_WIRE_TRANSFER_CREATE\",\"minAmount\":0,\"maxAmount\":0}],\"isEdit\":1,\"workFlowId\":1}";
 
    static String json8="{\"userId\":\"admin1\",\"contractId\":\"8436131351\",\"accountNo\":\"826612\",\"approvalRowList\":[{\"workflowId\":9,\"sequenceNo\":1,\"groupNo\":1,\"approvalRule\":\"Any three approvals\",\"role\":\"Administrator\",\"isChecker\":0}],\"workFlowFeatureActions\":[{\"workflowId\":9,\"isSequential\":1,\"featureActionId\":\"BILL_PAY_CREATE\",\"minAmount\":100,\"maxAmount\":300}],\"isEdit\":1,\"workFlowId\":9}";
-    @Override
+
+   static String json9="{\"userId\":\"admin1\",\"contractId\":\"8436131351\",\"accountNo\":\"826612\",\"approvalRowList\":[{\"workflowId\":0,\"sequenceNo\":1,\"groupNo\":1,\"approvalRule\":\"Any one approval\",\"role\":\"Administrator\",\"isChecker\":0},{\"workflowId\":0,\"sequenceNo\":1,\"groupNo\":2,\"approvalRule\":\"Any four approvals\",\"role\":\"Initiator\",\"isChecker\":0}],\"workFlowFeatureActions\":[{\"workflowId\":0,\"isSequential\":1,\"featureActionId\":\"BILL_PAY_CREATE\",\"minAmount\":\"1000\",\"maxAmount\":\"10000\"}],\"isEdit\":0,\"workFlowId\":0}";
+   static String json10="{\"userId\":\"admin1\",\"contractId\":\"8436131351\",\"accountNo\":\"826612\",\"approvalRowList\":[{\"workflowId\":0,\"sequenceNo\":1,\"groupNo\":1,\"approvalRule\":\"Any three approvals\",\"role\":\"Authorizer\",\"isChecker\":1},{\"workflowId\":0,\"sequenceNo\":1,\"groupNo\":2,\"approvalRule\":\"Any one approval\",\"role\":\"Approver\",\"isChecker\":0}],\"workFlowFeatureActions\":[{\"workflowId\":0,\"isSequential\":0,\"featureActionId\":\"BILL_PAY_CREATE\",\"minAmount\":\"100\",\"maxAmount\":\"1000\"}],\"isEdit\":0,\"workFlowId\":0}";
+   @Override
     public Object invoke(String s, Object[] objects, DataControllerRequest dataControllerRequest, DataControllerResponse dataControllerResponse)  {
 
         Result result = new Result();
@@ -81,7 +84,7 @@ public class CreateApprovalMatrix implements JavaService2 {
         connection.setAutoCommit(false);         ;
 
 
-        ApprovalRequestDto approvalRequestDto =  new Gson().fromJson(json8, ApprovalRequestDto.class);
+        ApprovalRequestDto approvalRequestDto =  new Gson().fromJson(json9, ApprovalRequestDto.class);
 //        approvalRequestDto.setUserId("4646038518");
 //        approvalRequestDto.setContractId("8436131351");
 //        approvalRequestDto.setAccountNo("1234545667");

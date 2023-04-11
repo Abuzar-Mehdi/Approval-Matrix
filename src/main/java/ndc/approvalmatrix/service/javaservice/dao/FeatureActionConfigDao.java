@@ -6,6 +6,7 @@ import ndc.approvalmatrix.service.javaservice.dto.FeatureActionConfigDto;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,79 +27,62 @@ public class FeatureActionConfigDao {
     public String createFeatureActionConfiguration(FeatureActionConfigDto featureActionConfigDto){
 
         String message= null;
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement1 = null;
+        PreparedStatement preparedStatement2 = null;
         int batchSize = 50;
-        int count = 0;
+        int count1 = 0;
+        int count2 = 0;
 
         try {
 
-            if(featureActionConfigDto.getIsInsert() == 1) {
 
-                String sql = "INSERT INTO ndc_featureactionconfig" +
-                        "(featureactionid, name, contractid, createby, createdate, modifyby, modifydate,isenabled,accountno)" +
-                        "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-                preparedStatement = connection.prepareStatement(Queries.FAC_QUERIES.FAC_QUERY1);
+            for (FeatureAction featureAction : featureActionConfigDto.getFeatureActions()) {
 
-                for (FeatureAction featureAction : featureActionConfigDto.getFeatureActions()) {
+                PreparedStatement preparedStatementx = connection.prepareStatement(Queries.FAC_QUERIES.FAC_QUERY3);
 
-                    preparedStatement.setString(1, featureAction.getFeatureActionId());
-                    preparedStatement.setString(2, featureAction.getName());
-                    preparedStatement.setString(3, featureActionConfigDto.getContractId());
-                    preparedStatement.setString(4, featureActionConfigDto.getCreateBy());
-                    preparedStatement.setString(5, LocalDate.now().toString());
-                    preparedStatement.setString(6, featureActionConfigDto.getModifyBy());
-                    preparedStatement.setString(7, LocalDate.now().toString());
-                    preparedStatement.setInt(8, featureAction.getIsEnabled());
+                preparedStatementx.setString(1, featureActionConfigDto.getContractId());
+                preparedStatementx.setString(2, featureActionConfigDto.getAccountNo());
+                preparedStatementx.setString(3, featureAction.getFeatureActionId());
 
-                    preparedStatement.setString(9, featureActionConfigDto.getAccountNo());
+                ResultSet resultSet = preparedStatementx.executeQuery();
 
-                    preparedStatement.addBatch();
+                if(resultSet.next()){
 
-                    if(count % batchSize == 0){
+                    preparedStatement2 = connection.prepareStatement(Queries.FAC_QUERIES.FAC_QUERY2);
+                    preparedStatement2.setString(1, featureAction.getFeatureActionId());
+                    preparedStatement2.setString(2, featureAction.getName());
+                    preparedStatement2.setString(3, featureActionConfigDto.getModifyBy());
+                    preparedStatement2.setString(4, LocalDate.now().toString());
+                    preparedStatement2.setInt(5, featureAction.getIsEnabled() ? 1 : 0);
+                    preparedStatement2.setString(6, featureActionConfigDto.getContractId());
+                    preparedStatement2.setString(7, featureActionConfigDto.getAccountNo());
+                    preparedStatement2.setString(8, featureAction.getFeatureActionId());
 
-                        preparedStatement.executeBatch();
-                        message = "RECORD INSERTED SUCCESSFULLY";
-                    }
+                    preparedStatement2.execute();
 
-                    count++;
+                }else{
+
+                    preparedStatement1 = connection.prepareStatement(Queries.FAC_QUERIES.FAC_QUERY1);
+                    preparedStatement1.setString(1, featureAction.getFeatureActionId());
+                    preparedStatement1.setString(2, featureAction.getName());
+                    preparedStatement1.setString(3, featureActionConfigDto.getContractId());
+                    preparedStatement1.setString(4, featureActionConfigDto.getCreateBy());
+                    preparedStatement1.setString(5, LocalDate.now().toString());
+                    preparedStatement1.setString(6, featureActionConfigDto.getModifyBy());
+                    preparedStatement1.setString(7, LocalDate.now().toString());
+                    preparedStatement1.setInt(8, featureAction.getIsEnabled() ? 1 : 0);
+
+                    preparedStatement1.setString(9, featureActionConfigDto.getAccountNo());
+
+                    preparedStatement1.execute();
+
                 }
 
-            }else {
 
-                String sql = "UPDATE ndc_featureactionconfig" +
-                        " SET featureactionid=?, name=?,  modifyby=?, modifydate=?, isenabled=?   " +
-                        "WHERE contractid=? and  accountno=? and featureactionid=?  ";
-
-                preparedStatement = connection.prepareStatement(Queries.FAC_QUERIES.FAC_QUERY2);
-
-                for (FeatureAction featureAction : featureActionConfigDto.getFeatureActions()) {
-
-                    preparedStatement.setString(1, featureAction.getFeatureActionId());
-                    preparedStatement.setString(2, featureAction.getName());
-                    preparedStatement.setString(3, featureActionConfigDto.getModifyBy());
-                    preparedStatement.setString(4, LocalDate.now().toString());
-                    preparedStatement.setInt(5, featureAction.getIsEnabled());
-
-
-
-                    preparedStatement.setString(6, featureActionConfigDto.getContractId());
-                    preparedStatement.setString(7, featureActionConfigDto.getAccountNo());
-                    preparedStatement.setString(8, featureAction.getFeatureActionId());
-
-                    preparedStatement.addBatch();
-
-                    if(count % batchSize == 0){
-
-                        preparedStatement.executeBatch();
-                        message = "RECORD UPDATED SUCCESSFULLY";
-                    }
-
-                    count++;
-                }
             }
 
-            preparedStatement.executeBatch();
+
 
         }catch (Exception e){
             try {

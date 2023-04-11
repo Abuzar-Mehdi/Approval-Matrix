@@ -79,10 +79,11 @@ public class GetWorkFlow implements JavaService2 {
 
           //  approvalWorkFlow.setMatrixId(Long.valueOf(dataControllerRequest.getParameter("matrixId")));
             approvalWorkFlow.setContractId("8436131351");
-            approvalWorkFlow.setAccountNo("86612");
-            approvalWorkFlow.setWorkflowId(6);
+            approvalWorkFlow.setAccountNo("826612");
+            approvalWorkFlow.setWorkflowId(1);
 
 
+            System.out.println("approvalWorkFlow = " + new Gson().toJson(approvalWorkFlow));
             GetWorkFlowDao getWorkFlowDao = new GetWorkFlowDao(connection);
 
 

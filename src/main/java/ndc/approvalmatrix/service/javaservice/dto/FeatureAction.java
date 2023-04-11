@@ -14,5 +14,5 @@ public class FeatureAction {
 
     private String featureActionId;
     private String name;
-    private Integer isEnabled;
+    private Boolean isEnabled;
 }

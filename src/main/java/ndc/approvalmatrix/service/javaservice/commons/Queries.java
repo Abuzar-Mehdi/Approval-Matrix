@@ -6,7 +6,7 @@ public class Queries {
 
     public static class CAM_QUERY {
 
-        public static final String CAM_QUERY1 = "SELECT a.id,MAX(b.workflowid) as wid  FROM ndc_am_matrix a inner join ndc_am_matrix_detail b on a.id =b.matrixid  where a.contractid=? and a.accountno=? and softdelete=0";
+        public static final String CAM_QUERY1 = "SELECT a.id,IFNULL(MAX(b.workflowid),0) as wid  FROM ndc_am_matrix a left join ndc_am_matrix_detail b on a.id =b.matrixid  where a.contractid=? and a.accountno=? and softdelete=0 group by a.id";
         public static final String CAM_QUERY2 = "INSERT INTO ndc_am_matrix (CONTRACTID, ACCOUNTNO,USERID )" +
                 " VALUES(?, ?, ?)";
 
@@ -92,6 +92,8 @@ public class Queries {
         public static final String FAC_QUERY2="UPDATE ndc_featureactionconfig " +
                 " SET featureactionid=?, name=?,  modifyby=?, modifydate=?, isenabled=? " +
                 " WHERE contractid=? and  accountno=? and featureactionid=?";
+
+        public static final String FAC_QUERY3="select 1 from  ndc_featureactionconfig where contractid=? and accountno=? and featureactionid=?";
 
     }
 
